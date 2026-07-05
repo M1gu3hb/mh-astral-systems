@@ -1,0 +1,122 @@
+/* Floating navbar island + overrides for the recolored StaggeredMenu so it
+   coexists with the island (docs/10 lets the builder decide how the staggered
+   menu and the planned mobile menu relate). */
+
+.mh-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  padding-top: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+  pointer-events: none;
+}
+.mh-navbar .container-mh {
+  pointer-events: auto;
+}
+
+/* GlassSurface renders its own centered content box; make our row fill it. */
+.mh-nav-island {
+  transition:
+    box-shadow 0.4s ease,
+    transform 0.4s ease;
+}
+.mh-navbar[data-scrolled] .mh-nav-island {
+  box-shadow:
+    0 10px 40px -18px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(30, 91, 255, 0.15);
+}
+
+.mh-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  padding: 0 0.6rem 0 0.9rem;
+}
+
+.mh-nav-links {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mh-nav-link {
+  position: relative;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #b7c0d6;
+  border-radius: 999px;
+  transition:
+    color 0.25s ease,
+    background 0.25s ease;
+}
+.mh-nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0.8rem;
+  right: 0.8rem;
+  bottom: 0.28rem;
+  height: 1.5px;
+  background: linear-gradient(90deg, #1e5bff, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mh-nav-link:hover,
+.mh-nav-link.is-active {
+  color: #f4f6fa;
+}
+.mh-nav-link:hover::after,
+.mh-nav-link.is-active::after {
+  transform: scaleX(1);
+}
+
+/* Desktop-only visibility is handled with Tailwind utilities on the element
+   (!hidden min-[900px]:!inline-flex) so it reliably beats the .btn display. */
+.mh-nav-cta {
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  flex: none;
+}
+
+@media (min-width: 900px) {
+  .mh-nav-links {
+    display: flex;
+  }
+}
+
+/* ---- StaggeredMenu coexistence overrides ---- */
+/* Keep the whole menu (toggle + panel overlay) above the floating island. */
+.mh-nav-menu.staggered-menu-wrapper.fixed-wrapper {
+  z-index: 70;
+}
+/* The island already carries the logo, so hide the menu's internal logo and
+   anchor the toggle to the right (flex-end, since the logo is gone). */
+.mh-nav-menu .sm-logo {
+  display: none;
+}
+.mh-nav-menu .staggered-menu-header {
+  justify-content: flex-end;
+  padding: clamp(0.95rem, 0.6rem + 1.2vw, 1.45rem) clamp(1.1rem, 0.6rem + 1.6vw, 2rem);
+}
+/* Give the toggle a small glass pill so it reads as a button over the hero. */
+.mh-nav-menu .sm-toggle {
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(14, 24, 48, 0.55);
+  border: 1px solid rgba(91, 140, 255, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+/* On desktop the inline island links are the primary nav; hide the toggle. */
+@media (min-width: 900px) {
+  .mh-nav-menu .sm-toggle {
+    display: none;
+  }
+}

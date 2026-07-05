@@ -1,0 +1,39 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="og-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070B16"/>
+      <stop offset="1" stop-color="#0B1120"/>
+    </linearGradient>
+    <linearGradient id="og-chrome" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#BFD6FF"/>
+      <stop offset="0.5" stop-color="#1E5BFF"/>
+      <stop offset="1" stop-color="#0A1F55"/>
+    </linearGradient>
+    <radialGradient id="og-glow" cx="0.78" cy="0.25" r="0.6">
+      <stop offset="0" stop-color="#1E5BFF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#1E5BFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#og-bg)"/>
+  <rect width="1200" height="630" fill="url(#og-glow)"/>
+
+  <!-- circuit hint lines -->
+  <g stroke="#1E5BFF" stroke-opacity="0.14" stroke-width="1.5" fill="none">
+    <path d="M0 120 H180 L220 160 H360"/>
+    <path d="M1200 520 H1020 L980 480 H820"/>
+    <circle cx="360" cy="160" r="4" fill="#1E5BFF" fill-opacity="0.5" stroke="none"/>
+    <circle cx="820" cy="480" r="4" fill="#1E5BFF" fill-opacity="0.5" stroke="none"/>
+  </g>
+
+  <!-- Monogram -->
+  <g transform="translate(90 250)">
+    <path d="M0 130V0h20l23 49 23-49h20v130h-20V72l-19 40h-10L38 72v58H0z" fill="#F4F6FA"/>
+    <path d="M120 130V0h20v48h33V0h20v130h-20V80h-33v50h-20z" fill="url(#og-chrome)"/>
+    <rect x="190" y="-16" width="18" height="18" rx="4" fill="#1E5BFF"/>
+    <rect x="214" y="-24" width="12" height="12" rx="3" fill="#5B8CFF"/>
+  </g>
+
+  <text x="90" y="470" font-family="'Space Grotesk', sans-serif" font-size="62" font-weight="700" fill="#F4F6FA">MH Astral Systems</text>
+  <text x="92" y="524" font-family="'IBM Plex Mono', monospace" font-size="26" letter-spacing="6" fill="#5B8CFF">UX · WEB · SYSTEMS</text>
+  <text x="92" y="566" font-family="'IBM Plex Sans', sans-serif" font-size="24" fill="#8B93A7">Páginas web y sistemas que sí venden y organizan.</text>
+</svg>

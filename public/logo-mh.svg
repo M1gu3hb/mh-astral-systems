@@ -1,0 +1,26 @@
+<svg width="140" height="48" viewBox="0 0 140 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MH Astral Systems">
+  <defs>
+    <linearGradient id="mh-chrome" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#BFD6FF"/>
+      <stop offset="0.35" stop-color="#5B8CFF"/>
+      <stop offset="0.7" stop-color="#1E5BFF"/>
+      <stop offset="1" stop-color="#0A1F55"/>
+    </linearGradient>
+    <linearGradient id="mh-ink" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#20242E"/>
+      <stop offset="1" stop-color="#0A0A0C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Monogram MH -->
+  <!-- M (black / metal ink) -->
+  <path d="M4 40V10h6.4l7.1 15.2L24.6 10H31v30h-6V22.7l-5.9 12.4h-3.2L10 22.7V40H4z" fill="url(#mh-ink)" stroke="#2A2F3A" stroke-width="0.5"/>
+  <!-- H (chrome blue gradient) -->
+  <path d="M40 40V10h6.2v11.2h9.6V10H62v30h-6.2V27.2h-9.6V40H40z" fill="url(#mh-chrome)"/>
+
+  <!-- 4 pixel squares — the "digital/binary assembling" motif, top-right of the logo -->
+  <rect x="70" y="8" width="6" height="6" rx="1.2" fill="#1E5BFF"/>
+  <rect x="79" y="6" width="4.5" height="4.5" rx="1" fill="#5B8CFF"/>
+  <rect x="79" y="13" width="3.2" height="3.2" rx="0.8" fill="#BFD6FF"/>
+  <rect x="86" y="9" width="2.4" height="2.4" rx="0.6" fill="#1E5BFF"/>
+</svg>

@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    color-scheme: dark;
+    --brand-electric: #1e5bff;
+    --brand-electric-400: #5b8cff;
+    --brand-void: #070b16;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-void text-white font-sans;
+    margin: 0;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(60rem 60rem at 82% -10%, rgba(30, 91, 255, 0.14), transparent 60%),
+      radial-gradient(50rem 50rem at -10% 20%, rgba(10, 31, 85, 0.35), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: rgba(30, 91, 255, 0.35);
+    color: #f4f6fa;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  /* Visible keyboard focus everywhere (docs/06 checklist). */
+  :focus-visible {
+    outline: 2px solid var(--brand-electric-400);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Custom scrollbar to match the brand */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #070b16;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #16213f;
+    border-radius: 999px;
+    border: 2px solid #070b16;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #1e5bff;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Brand components / patterns                                         */
+/* ------------------------------------------------------------------ */
+@layer components {
+  .container-mh {
+    @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8;
+  }
+
+  /* Section eyebrow: mono label with the "dot + line" brand motif */
+  .eyebrow {
+    @apply inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.28em] text-electric-400;
+  }
+
+  /* Liquid-glass card pattern — the site-wide "vidrio líquido" language
+     (docs/10). Blur + soft gradient border + inner glow, brand colors,
+     never a hard shadow. Reused across casos, tiers, proceso, portal, admin. */
+  .glass-card {
+    position: relative;
+    border-radius: 1.5rem;
+    background:
+      linear-gradient(160deg, rgba(14, 24, 48, 0.72), rgba(11, 17, 32, 0.55));
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    border: 1px solid rgba(91, 140, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(191, 214, 255, 0.12),
+      inset 0 0 40px -24px rgba(91, 140, 255, 0.6),
+      0 24px 60px -34px rgba(0, 0, 0, 0.9);
+    transition:
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  /* the double-bezel: subtle refracted top-edge highlight */
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      145deg,
+      rgba(191, 214, 255, 0.4),
+      rgba(30, 91, 255, 0.05) 30%,
+      transparent 55%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glass-card--interactive:hover {
+    transform: translateY(-3px);
+    border-color: rgba(30, 91, 255, 0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(191, 214, 255, 0.18),
+      inset 0 0 50px -22px rgba(91, 140, 255, 0.75),
+      0 30px 70px -30px rgba(30, 91, 255, 0.5);
+  }
+
+  /* Pill buttons (docs/02) */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill font-medium
+      transition-all duration-300 ease-out-brand select-none;
+    padding: 0.8rem 1.6rem;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  .btn-primary {
+    @apply bg-electric-600 text-white;
+    box-shadow: 0 10px 30px -10px rgba(30, 91, 255, 0.7);
+  }
+  .btn-primary:hover {
+    @apply bg-electric-400;
+    box-shadow: 0 14px 40px -10px rgba(30, 91, 255, 0.85);
+  }
+  .btn-ghost {
+    @apply border text-white;
+    border-color: rgba(139, 147, 167, 0.4);
+    background: rgba(14, 24, 48, 0.3);
+  }
+  .btn-ghost:hover {
+    border-color: rgba(30, 91, 255, 0.7);
+    background: rgba(30, 91, 255, 0.1);
+  }
+  /* the arrow inside a button drifts diagonally on hover (docs/04) */
+  .btn .btn-arrow {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn:hover .btn-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  /* "dot + line" divider motif with the diagonal cut (docs/02) */
+  .dot-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .dot-line::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #1e5bff;
+    box-shadow: 0 0 10px rgba(30, 91, 255, 0.8);
+    flex: none;
+  }
+  .dot-line::after {
+    content: '';
+    height: 1px;
+    width: 2.5rem;
+    background: linear-gradient(90deg, #1e5bff, transparent);
+    /* diagonal cut at the end of the line */
+    clip-path: polygon(0 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+  }
+
+  .card-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Utilities                                                           */
+/* ------------------------------------------------------------------ */
+@layer utilities {
+  .text-gradient-chrome {
+    background: linear-gradient(120deg, #bfd6ff, #5b8cff 40%, #1e5bff 75%, #0a1f55);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .bg-circuit {
+    background-image:
+      linear-gradient(rgba(30, 91, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 91, 255, 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion — reduce to short fades, no big translations/parallax */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.12s !important;
+    scroll-behavior: auto !important;
+  }
+}

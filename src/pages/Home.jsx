@@ -1,4 +1,5 @@
 import Hero from '../components/home/Hero';
+import ClientMarquee from '../components/home/ClientMarquee';
 import Servicios from '../components/home/Servicios';
 import SistemasBento from '../components/home/SistemasBento';
 import Casos from '../components/home/Casos';
@@ -8,12 +9,14 @@ import Proceso from '../components/home/Proceso';
 import ContactCard from '../components/home/ContactCard';
 import CTAFinal from '../components/home/CTAFinal';
 
-// Home — the sales page. Section order follows docs/01, with the systems bento
-// slotted between the flyer-style service list and the case-study proof.
+// Home — the sales page. Section order follows docs/01: proof strip right
+// after the hero, then the flyer-style service list, the systems bento and
+// the case-study proof.
 export default function Home() {
   return (
     <>
       <Hero />
+      <ClientMarquee />
       <Servicios />
       <SistemasBento />
       <Casos />

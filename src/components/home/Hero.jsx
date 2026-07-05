@@ -30,6 +30,13 @@ const HEADLINE_WORDS = [
   { t: HERO.headlineTail, accent: false },
 ];
 
+// Proof strip — only facts that exist in the docs. No invented metrics.
+const PROOF = [
+  { v: '04', l: 'sistemas en producción' },
+  { v: '100%', l: 'negocios reales, cero mockups' },
+  { v: '1:1', l: 'trato directo con Miguel' },
+];
+
 export default function Hero() {
   const reduced = usePrefersReducedMotion();
 
@@ -48,7 +55,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-16">
+    <section className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-20">
       {/* animated brand background */}
       <div className="absolute inset-0 -z-10">
         <HeroBackground />
@@ -78,23 +85,40 @@ export default function Hero() {
 
           <motion.div variants={item} className="flex flex-wrap items-center gap-3">
             <a
-              className="btn btn-primary"
+              className="btn btn-primary pr-2"
               href={whatsappLink(WA_MESSAGES.general)}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {HERO.ctaPrimary}
-              <ArrowUpRight className="btn-arrow" size={17} strokeWidth={2} />
+              <span>{HERO.ctaPrimary}</span>
+              <span className="btn-orb bg-white/15">
+                <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
+              </span>
             </a>
-            <a className="btn btn-ghost" href="#casos">
-              {HERO.ctaSecondary}
-              <ArrowDown className="btn-arrow" size={16} strokeWidth={2} />
+            <a className="btn btn-ghost pr-2" href="#casos">
+              <span>{HERO.ctaSecondary}</span>
+              <span className="btn-orb bg-electric-600/20 text-electric-400">
+                <ArrowDown size={15} strokeWidth={1.75} aria-hidden="true" />
+              </span>
             </a>
           </motion.div>
 
-          <motion.div variants={item} className="flex items-center gap-3 pt-2 text-xs text-silver-faint">
+          {/* proof row — real facts, editorial treatment */}
+          <motion.div variants={item} className="mt-2 flex flex-wrap items-stretch gap-x-0 gap-y-4">
+            {PROOF.map((p, i) => (
+              <div
+                key={p.v}
+                className={`flex flex-col gap-1 pr-7 ${i > 0 ? 'border-l border-white/10 pl-7' : ''}`}
+              >
+                <span className="font-mono text-xl font-semibold text-white sm:text-2xl">{p.v}</span>
+                <span className="max-w-[10rem] text-[0.7rem] leading-snug text-silver-faint">{p.l}</span>
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div variants={item} className="flex items-center gap-3 pt-1 text-xs text-silver-faint">
             <PixelSquares />
-            <span className="font-mono uppercase tracking-[0.2em]">Sistemas reales, no mockups · CDMX</span>
+            <span className="font-mono uppercase tracking-[0.2em]">Xochimilco · CDMX</span>
           </motion.div>
         </motion.div>
 
@@ -117,6 +141,19 @@ export default function Hero() {
           />
         </div>
       </div>
+
+      {/* scroll cue */}
+      {!reduced && (
+        <div
+          className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex"
+          aria-hidden="true"
+        >
+          <span className="font-mono text-[0.55rem] uppercase tracking-[0.4em] text-silver-faint">Scroll</span>
+          <span className="block h-9 w-px overflow-hidden">
+            <span className="scroll-cue-line block h-full w-full bg-gradient-to-b from-electric-400 to-transparent" />
+          </span>
+        </div>
+      )}
     </section>
   );
 }

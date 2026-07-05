@@ -14,18 +14,21 @@ export default function Tiers() {
       <div className="container-mh">
         <SectionHeading
           align="center"
+          index="05"
           eyebrow="Planes"
           title="Elige cuánto control quieres"
           lead="Desde una presencia bien hecha hasta un sistema que editas tú mismo, con o sin generación de imágenes por IA."
         />
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <div className="mt-14 grid items-stretch gap-5 lg:grid-cols-3">
           {TIERS.map((t, i) => (
-            <Reveal key={t.nombre} delay={i * 0.08}>
+            <Reveal key={t.nombre} delay={i * 0.08} className={t.destacado ? 'lg:relative lg:z-10' : ''}>
               <GlassCard
                 interactive
                 className={`flex h-full flex-col gap-5 p-6 sm:p-7 ${
-                  t.destacado ? 'ring-1 ring-electric-600/60 shadow-glow' : ''
+                  t.destacado
+                    ? 'ring-1 ring-electric-600/60 shadow-glow lg:scale-[1.045] lg:-translate-y-1.5'
+                    : 'lg:mt-2'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -71,7 +74,18 @@ export default function Tiers() {
           ))}
         </div>
 
-        <p className="mt-6 text-center text-xs text-silver-faint">
+        <p className="mt-9 text-center text-sm text-silver-dim">
+          ¿No sabes cuál va con tu negocio?{' '}
+          <a
+            href={whatsappLink(WA_MESSAGES.cotizar)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border-b border-electric-600/50 pb-0.5 font-medium text-electric-400 transition-colors duration-300 hover:border-electric-400 hover:text-white"
+          >
+            Escríbeme y lo definimos juntos
+          </a>
+        </p>
+        <p className="mt-3 text-center text-xs text-silver-faint">
           Cambios menores incluidos según tu plan · cambios grandes se cotizan aparte.
         </p>
       </div>

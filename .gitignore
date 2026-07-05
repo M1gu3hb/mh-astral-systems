@@ -31,3 +31,6 @@ logs
 /*.jpeg
 /*.jpg
 /logo.png
+
+.vercel
+.env*

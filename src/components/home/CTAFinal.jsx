@@ -31,18 +31,23 @@ export default function CTAFinal() {
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <a
-                  className="btn btn-primary"
+                  className="btn btn-primary pr-2"
                   href={whatsappLink(WA_MESSAGES.general)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Escríbeme al {SITE.whatsapp.display}
-                  <ArrowUpRight className="btn-arrow" size={17} strokeWidth={2} />
+                  <span>Escríbeme al {SITE.whatsapp.display}</span>
+                  <span className="btn-orb bg-white/15">
+                    <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
+                  </span>
                 </a>
                 <a className="btn btn-ghost" href={`mailto:${SITE.email}`}>
                   {SITE.email}
                 </a>
               </div>
+              <p className="font-mono text-[0.62rem] uppercase tracking-[0.28em] text-silver-faint">
+                Respondo yo — sin bots, sin agencia de por medio
+              </p>
             </div>
           </div>
         </Reveal>

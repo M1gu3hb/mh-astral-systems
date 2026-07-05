@@ -13,6 +13,7 @@ export default function SistemasBento() {
       <div className="container-mh flex flex-col items-center">
         <SectionHeading
           align="center"
+          index="02"
           eyebrow="El sistema completo"
           title="No es una página. Es tu operación, ordenada."
           lead="Cada pieza se conecta: presencia, ventas, seguimiento y medición trabajando como un solo sistema."

@@ -9,12 +9,18 @@ export default function Proceso() {
     <section id="proceso" className="scroll-mt-28 py-section">
       <div className="container-mh">
         <SectionHeading
+          index="06"
           eyebrow="Cómo trabajamos"
           title="Un proceso claro, sin sorpresas"
           lead="Del diagnóstico a la entrega, ves avances en el camino y sabes exactamente qué recibes."
         />
 
-        <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="relative mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {/* connecting circuit line behind the steps (desktop) */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-10 right-10 top-12 hidden h-px bg-gradient-to-r from-electric-600/0 via-electric-600/35 to-electric-600/0 lg:block"
+          />
           {PROCESO.map((p, i) => (
             <Reveal key={p.n} delay={i * 0.08} as="li">
               <div className="group relative h-full rounded-2xl border border-white/8 bg-void-2/40 p-6 transition-all duration-300 ease-out-brand hover:-translate-y-1 hover:border-electric-600/40">

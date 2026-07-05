@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import FloatingWhatsApp from '../ui/FloatingWhatsApp';
 
 // Shared chrome for the public marketing site (Home + Blog). Handles scrolling
 // to the top on route change and to a #hash target when present.
@@ -24,6 +25,7 @@ export default function SiteLayout({ children }) {
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
+      <FloatingWhatsApp />
     </div>
   );
 }

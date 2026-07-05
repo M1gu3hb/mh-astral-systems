@@ -77,7 +77,7 @@ export default function Navbar() {
         socialItems={SOCIAL_ITEMS}
         displaySocials
         displayItemNumbering
-        logoUrl="/logo-mh.svg"
+        logoUrl="/logo.png"
         menuButtonColor="#F4F6FA"
         openMenuButtonColor="#F4F6FA"
         accentColor="#1E5BFF"

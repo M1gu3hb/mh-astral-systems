@@ -27,7 +27,7 @@ export default function Servicios() {
                 href={whatsappLink(s.highlight ? WA_MESSAGES.panel : WA_MESSAGES.general)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group flex h-full items-start gap-4 rounded-2xl border p-4 transition-all duration-500 ease-out-brand sm:p-5 ${
+                className={`cursor-card group flex h-full items-start gap-4 overflow-hidden rounded-2xl border p-4 transition-all duration-500 ease-out-brand sm:p-5 ${
                   s.highlight
                     ? 'border-electric-600/50 bg-electric-900/20 shadow-glow-soft hover:border-electric-400/70'
                     : 'border-white/8 bg-void-2/40 hover:-translate-y-0.5 hover:border-electric-600/40 hover:bg-void-2/70'

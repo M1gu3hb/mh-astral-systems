@@ -11,11 +11,11 @@ export default function Logo({ withWordmark = true, className = '' }) {
       aria-label={`${SITE.name} — inicio`}
     >
       <img
-        src="/logo-mh.svg"
+        src="/logo.png"
         alt=""
-        width={44}
-        height={30}
-        className="h-[30px] w-auto transition-transform duration-300 ease-out-brand group-hover:scale-105"
+        width={38}
+        height={34}
+        className="h-[34px] w-auto drop-shadow-[0_0_14px_rgba(30,91,255,0.35)] transition-transform duration-300 ease-out-brand group-hover:scale-105"
         draggable={false}
       />
       {withWordmark && (

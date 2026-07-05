@@ -1,7 +1,6 @@
 import Hero from '../components/home/Hero';
 import ClientMarquee from '../components/home/ClientMarquee';
 import Servicios from '../components/home/Servicios';
-import SistemasBento from '../components/home/SistemasBento';
 import Casos from '../components/home/Casos';
 import Diferenciador from '../components/home/Diferenciador';
 import Tiers from '../components/home/Tiers';
@@ -18,7 +17,6 @@ export default function Home() {
       <Hero />
       <ClientMarquee />
       <Servicios />
-      <SistemasBento />
       <Casos />
       <Diferenciador />
       <Tiers />

@@ -32,7 +32,8 @@ export default {
         signature: ['"Dancing Script"', 'cursive'],
       },
       fontSize: {
-        hero: ['clamp(2.75rem, 1rem + 8vw, 7rem)', { lineHeight: '0.95', letterSpacing: '-0.03em' }],
+        hero: ['clamp(2.6rem, 1rem + 5vw, 4.5rem)', { lineHeight: '1.02', letterSpacing: '-0.025em' }],
+        'hero-accent': ['clamp(3rem, 1rem + 6.4vw, 6rem)', { lineHeight: '0.94', letterSpacing: '-0.035em' }],
         'section-title': ['clamp(1.9rem, 1rem + 3.2vw, 3.4rem)', { lineHeight: '1.02', letterSpacing: '-0.02em' }],
       },
       spacing: {
@@ -61,13 +62,23 @@ export default {
         },
         'float-slow': {
           '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-8px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'spin-slow': {
+          to: { transform: 'rotate(360deg)' },
+        },
+        'glow-breathe': {
+          '0%, 100%': { opacity: '0.55', transform: 'scale(1)' },
+          '50%': { opacity: '0.9', transform: 'scale(1.06)' },
         },
       },
       animation: {
         'pulse-dot': 'pulse-dot 2.4s ease-in-out infinite',
         scanline: 'scanline 2.6s ease-in-out',
         'float-slow': 'float-slow 6s ease-in-out infinite',
+        'spin-slow': 'spin-slow 24s linear infinite',
+        'spin-slower': 'spin-slow 40s linear infinite reverse',
+        'glow-breathe': 'glow-breathe 5s ease-in-out infinite',
       },
     },
   },

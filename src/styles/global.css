@@ -102,23 +102,52 @@
 
   /* Liquid-glass card pattern — the site-wide "vidrio líquido" language
      (docs/10). Blur + soft gradient border + inner glow, brand colors,
-     never a hard shadow. Reused across casos, tiers, proceso, portal, admin. */
+     never a hard shadow. Reused across casos, tiers, proceso, portal, admin.
+     A cursor-tracked radial (via --gx/--gy/--gi from CursorGlow) makes every
+     card react to the mouse, like the bento spotlight but site-wide. */
   .glass-card {
     position: relative;
     border-radius: 1.5rem;
     background:
+      radial-gradient(
+        220px circle at var(--gx, 50%) var(--gy, 50%),
+        rgba(30, 91, 255, calc(var(--gi, 0) * 0.16)),
+        transparent 60%
+      ),
       linear-gradient(160deg, rgba(14, 24, 48, 0.72), rgba(11, 17, 32, 0.55));
     backdrop-filter: blur(18px) saturate(1.25);
     -webkit-backdrop-filter: blur(18px) saturate(1.25);
-    border: 1px solid rgba(91, 140, 255, 0.14);
+    border: 1px solid rgba(91, 140, 255, calc(0.14 + var(--gi, 0) * 0.4));
     box-shadow:
       inset 0 1px 0 rgba(191, 214, 255, 0.12),
       inset 0 0 40px -24px rgba(91, 140, 255, 0.6),
       0 24px 60px -34px rgba(0, 0, 0, 0.9);
     transition:
       transform 0.5s var(--ease-brand),
-      border-color 0.5s var(--ease-brand),
+      border-color 0.4s ease,
       box-shadow 0.5s var(--ease-brand);
+  }
+
+  /* lightweight cursor reactivity for non-glass bordered surfaces */
+  .cursor-card {
+    position: relative;
+    z-index: 0; /* stacking context so the glow sits behind the content */
+    transition: border-color 0.4s ease, background 0.4s ease;
+  }
+  .cursor-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: var(--gi, 0);
+    transition: opacity 0.4s ease;
+    background: radial-gradient(
+      180px circle at var(--gx, 50%) var(--gy, 50%),
+      rgba(30, 91, 255, 0.14),
+      transparent 60%
+    );
   }
 
   /* the double-bezel: subtle refracted top-edge highlight */
@@ -264,6 +293,29 @@
   }
   .mh-marquee:hover {
     animation-play-state: paused;
+  }
+
+  /* Page-wide cursor spotlight (screen blend so it only adds light). */
+  .cursor-spotlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 540px;
+    height: 540px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 40;
+    opacity: 0;
+    will-change: transform, opacity;
+    transition: opacity 0.5s ease;
+    mix-blend-mode: screen;
+    background: radial-gradient(
+      circle,
+      rgba(30, 91, 255, 0.1) 0%,
+      rgba(30, 91, 255, 0.05) 28%,
+      rgba(91, 140, 255, 0.02) 46%,
+      transparent 68%
+    );
   }
 
   .card-grain {

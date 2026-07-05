@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import CursorGlow from './components/ui/CursorGlow';
 import SiteLayout from './components/layout/SiteLayout';
 import Home from './pages/Home';
 import Blog from './pages/Blog';
@@ -14,7 +15,9 @@ import NotFound from './pages/NotFound';
 // areas have their own minimal chrome.
 export default function App() {
   return (
-    <Routes>
+    <>
+      <CursorGlow />
+      <Routes>
       <Route
         path="/"
         element={
@@ -56,6 +59,7 @@ export default function App() {
           </SiteLayout>
         }
       />
-    </Routes>
+      </Routes>
+    </>
   );
 }

@@ -85,7 +85,7 @@ export default function ContactCard() {
 
               <div className="flex items-start justify-between gap-6">
                 <div className="flex flex-col gap-1">
-                  <img src="/logo-mh.svg" alt="MH Astral Systems" width={120} className="w-28" />
+                  <img src="/logo.png" alt="MH Astral Systems" width={92} className="w-20" />
                   <span className="mt-1 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-card-accent">
                     {SITE.subTagline}
                   </span>

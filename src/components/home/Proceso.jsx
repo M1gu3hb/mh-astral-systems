@@ -23,7 +23,7 @@ export default function Proceso() {
           />
           {PROCESO.map((p, i) => (
             <Reveal key={p.n} delay={i * 0.08} as="li">
-              <div className="group relative h-full rounded-2xl border border-white/8 bg-void-2/40 p-6 transition-all duration-300 ease-out-brand hover:-translate-y-1 hover:border-electric-600/40">
+              <div className="cursor-card group h-full overflow-hidden rounded-2xl border border-white/8 bg-void-2/40 p-6 transition-all duration-300 ease-out-brand hover:-translate-y-1 hover:border-electric-600/40">
                 <span className="font-mono text-4xl font-semibold text-electric-900 transition-colors duration-300 group-hover:text-electric-600">
                   {p.n}
                 </span>

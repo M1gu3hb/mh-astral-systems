@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { Search, FileText, Hammer, Rocket } from 'lucide-react';
 import { PROCESO } from '../../data/proceso';
 import VideoBackdrop from '../backgrounds/VideoBackdrop';
+import GlassSurface from '../reactbits/GlassSurface';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 // Video slot — drop the Google Flow clip here as /public/media/proceso-loop.mp4
@@ -22,18 +23,35 @@ function StepCard({ progress, index, step }) {
   const Icon = ICONS[index];
 
   return (
-    <motion.div style={{ opacity, y, scale, filter }} className="relative">
-      <div className="glass-card glass-card--interactive flex h-full flex-col gap-4 p-6 sm:p-7">
-        <div className="flex items-center justify-between">
-          <span className="grid h-11 w-11 place-items-center rounded-xl border border-electric-600/40 bg-electric-900/25">
-            <Icon size={20} strokeWidth={1.5} className="text-electric-400" aria-hidden="true" />
-          </span>
-          <span className="font-mono text-4xl font-semibold text-white/[0.08]">{step.n}</span>
+    <motion.div style={{ opacity, y, scale, filter }} className="relative h-[236px]">
+      {/* SAME liquid-glass component as the header — refracts the ambient
+          background behind it, like water */}
+      <GlassSurface
+        width="100%"
+        height="100%"
+        borderRadius={22}
+        backgroundOpacity={0.08}
+        brightness={60}
+        blur={11}
+        distortionScale={-150}
+        greenOffset={12}
+        blueOffset={22}
+        className="w-full"
+      >
+        <div className="flex h-full w-full flex-col justify-between p-5 text-left sm:p-6">
+          <div className="flex items-center justify-between">
+            <span className="grid h-11 w-11 place-items-center rounded-xl border border-electric-600/40 bg-electric-900/40">
+              <Icon size={20} strokeWidth={1.5} className="text-electric-400" aria-hidden="true" />
+            </span>
+            <span className="font-mono text-4xl font-semibold text-white/[0.1]">{step.n}</span>
+          </div>
+          <div>
+            <div className="dot-line mb-3" />
+            <h3 className="font-display text-lg font-semibold text-white">{step.titulo}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-silver-dim">{step.desc}</p>
+          </div>
         </div>
-        <div className="dot-line" />
-        <h3 className="font-display text-lg font-semibold text-white">{step.titulo}</h3>
-        <p className="text-sm leading-relaxed text-silver-dim">{step.desc}</p>
-      </div>
+      </GlassSurface>
     </motion.div>
   );
 }

@@ -10,7 +10,9 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 // feedback). Pure transform/opacity motion; the halo is decorative only.
 function LogoHero({ reduced }) {
   return (
-    <div className="relative mx-auto grid aspect-square w-full max-w-[26rem] place-items-center">
+    // Mobile: a compact emblem that lives INSIDE the hero (not a full-screen
+    // block). Desktop: the large side visual, unchanged.
+    <div className="relative mx-auto grid aspect-square w-full max-w-[13rem] place-items-center sm:max-w-[17rem] lg:max-w-[26rem]">
       {/* ambient radial bloom */}
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(30,91,255,0.35),transparent_62%)] blur-2xl animate-glow-breathe" />
 
@@ -92,9 +94,9 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-void/55 via-void/45 to-void" />
       </div>
 
-      <div className="container-mh grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6">
+      <div className="container-mh flex flex-col items-center gap-7 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-6">
         {/* copy */}
-        <motion.div variants={container} initial="hidden" animate="show" className="flex max-w-xl flex-col gap-6">
+        <motion.div variants={container} initial="hidden" animate="show" className="order-2 flex max-w-xl flex-col gap-6 lg:order-1">
           <motion.span
             variants={item}
             className="inline-flex w-fit items-center gap-2.5 rounded-full border border-electric-600/25 bg-electric-900/20 px-3.5 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.28em] text-electric-400 backdrop-blur-sm"
@@ -153,7 +155,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="relative"
+          className="relative order-1 lg:order-2"
         >
           <LogoHero reduced={reduced} />
         </motion.div>

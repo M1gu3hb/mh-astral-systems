@@ -1,26 +1,26 @@
 import Hero from '../components/home/Hero';
 import ClientMarquee from '../components/home/ClientMarquee';
-import Servicios from '../components/home/Servicios';
-import Casos from '../components/home/Casos';
+import ServiciosShowcase from '../components/home/ServiciosShowcase';
 import Diferenciador from '../components/home/Diferenciador';
+import Casos from '../components/home/Casos';
 import Tiers from '../components/home/Tiers';
-import Proceso from '../components/home/Proceso';
+import ProcesoShowcase from '../components/home/ProcesoShowcase';
 import ContactCard from '../components/home/ContactCard';
 import CTAFinal from '../components/home/CTAFinal';
 
-// Home — the sales page. Section order follows docs/01: proof strip right
-// after the hero, then the flyer-style service list, the systems bento and
-// the case-study proof.
+// Home — the sales page. Order per client direction: hero → proof strip →
+// services (scroll showcase) → the auto-edit panel differentiator → real cases
+// (expandable) → pricing → process (scroll showcase) → contact → final CTA.
 export default function Home() {
   return (
     <>
       <Hero />
       <ClientMarquee />
-      <Servicios />
-      <Casos />
+      <ServiciosShowcase />
       <Diferenciador />
+      <Casos />
       <Tiers />
-      <Proceso />
+      <ProcesoShowcase />
       <ContactCard />
       <CTAFinal />
     </>

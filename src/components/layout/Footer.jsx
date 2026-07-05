@@ -28,7 +28,6 @@ export default function Footer() {
           <a href="/#precios" className="text-silver-dim transition-colors hover:text-white">Precios</a>
           <Link to="/blog" className="text-silver-dim transition-colors hover:text-white">Blog</Link>
           <Link to="/portal" className="text-silver-dim transition-colors hover:text-white">Portal de cliente</Link>
-          <Link to="/admin" className="text-silver-dim transition-colors hover:text-white">Admin</Link>
         </nav>
 
         <div className="flex flex-col gap-3 text-sm">

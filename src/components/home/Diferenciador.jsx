@@ -215,7 +215,7 @@ export default function Diferenciador() {
       <div className="container-mh grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="flex flex-col gap-6">
           <SectionHeading
-            index="04"
+            index="02"
             eyebrow="El diferenciador"
             title="Tu página, editable por ti"
             lead="El problema no es técnico, es de negocio: si dependes de tu desarrollador para cada cambio menor, esperas — y mientras esperas, no vendes. El panel de autoedición quita ese cuello de botella."

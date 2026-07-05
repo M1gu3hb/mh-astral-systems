@@ -14,7 +14,7 @@ export default function Tiers() {
       <div className="container-mh">
         <SectionHeading
           align="center"
-          index="05"
+          index="04"
           eyebrow="Planes"
           title="Elige cuánto control quieres"
           lead="Desde una presencia bien hecha hasta un sistema que editas tú mismo, con o sin generación de imágenes por IA."

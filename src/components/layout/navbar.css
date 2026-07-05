@@ -1,6 +1,6 @@
-/* Floating navbar island + overrides for the recolored StaggeredMenu so it
-   coexists with the island (docs/10 lets the builder decide how the staggered
-   menu and the planned mobile menu relate). */
+/* Floating navbar island + a custom hamburger that drives the recolored
+   StaggeredMenu overlay (docs/10 lets the builder decide how the staggered
+   menu relates to the site nav). */
 
 .mh-navbar {
   position: fixed;
@@ -15,7 +15,6 @@
   pointer-events: auto;
 }
 
-/* GlassSurface renders its own centered content box; make our row fill it. */
 .mh-nav-island {
   transition:
     box-shadow 0.4s ease,
@@ -34,7 +33,7 @@
   gap: 1rem;
   width: 100%;
   height: 100%;
-  padding: 0 0.6rem 0 0.9rem;
+  padding: 0 0.55rem 0 0.9rem;
 }
 
 .mh-nav-links {
@@ -75,8 +74,6 @@
   transform: scaleX(1);
 }
 
-/* Desktop-only visibility is handled with Tailwind utilities on the element
-   (!hidden min-[900px]:!inline-flex) so it reliably beats the .btn display. */
 .mh-nav-cta {
   padding: 0.55rem 1rem;
   font-size: 0.85rem;
@@ -89,34 +86,122 @@
   }
 }
 
-/* ---- StaggeredMenu coexistence overrides ---- */
-/* Keep the whole menu (toggle + panel overlay) above the floating island. */
+/* ---- custom hamburger button (inside the island) ---- */
+.mh-menu-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 13px;
+  cursor: pointer;
+  background: linear-gradient(160deg, rgba(30, 91, 255, 0.18), rgba(14, 24, 48, 0.4));
+  border: 1px solid rgba(91, 140, 255, 0.28);
+  box-shadow: inset 0 1px 0 rgba(191, 214, 255, 0.16);
+  transition:
+    border-color 0.35s var(--ease-brand),
+    background 0.35s var(--ease-brand),
+    transform 0.35s var(--ease-brand);
+}
+.mh-menu-btn:hover {
+  border-color: rgba(30, 91, 255, 0.65);
+  background: linear-gradient(160deg, rgba(30, 91, 255, 0.28), rgba(14, 24, 48, 0.5));
+}
+.mh-menu-btn:active {
+  transform: scale(0.94);
+}
+
+.mh-menu-lines {
+  position: relative;
+  width: 17px;
+  height: 12px;
+}
+.mh-menu-lines span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: #dbe4ff;
+  transition:
+    transform 0.4s var(--ease-brand),
+    opacity 0.25s ease,
+    background 0.3s ease,
+    width 0.4s var(--ease-brand);
+}
+.mh-menu-lines span:nth-child(1) {
+  top: 0;
+}
+.mh-menu-lines span:nth-child(2) {
+  top: 5px;
+  width: 70%;
+}
+.mh-menu-lines span:nth-child(3) {
+  top: 10px;
+}
+.mh-menu-btn:hover .mh-menu-lines span {
+  background: #5b8cff;
+}
+.mh-menu-btn:hover .mh-menu-lines span:nth-child(2) {
+  width: 100%;
+}
+/* morph to X */
+.mh-menu-btn[data-open] .mh-menu-lines span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+.mh-menu-btn[data-open] .mh-menu-lines span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.mh-menu-btn[data-open] .mh-menu-lines span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+/* ---- floating close button (above the overlay panel) ---- */
+.mh-menu-close {
+  position: fixed;
+  top: clamp(1.05rem, 0.7rem + 1vw, 1.5rem);
+  right: clamp(1.15rem, 0.6rem + 1.8vw, 2.25rem);
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #f4f6fa;
+  background: linear-gradient(160deg, rgba(30, 91, 255, 0.28), rgba(11, 17, 32, 0.65));
+  border: 1px solid rgba(91, 140, 255, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(191, 214, 255, 0.2),
+    0 12px 30px -12px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s var(--ease-brand);
+}
+.mh-menu-close:hover {
+  border-color: rgba(30, 91, 255, 0.8);
+  transform: rotate(90deg);
+}
+
+/* ---- dim backdrop behind the overlay ---- */
+.mh-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 56;
+  background: rgba(4, 7, 15, 0.62);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+/* ---- StaggeredMenu overrides ---- */
+/* Keep the overlay (panel) above the island; hide the component's own header
+   (we drive it from the island hamburger instead). */
 .mh-nav-menu.staggered-menu-wrapper.fixed-wrapper {
   z-index: 70;
 }
-/* The island already carries the logo, so hide the menu's internal logo and
-   anchor the toggle to the right (flex-end, since the logo is gone). */
-.mh-nav-menu .sm-logo {
-  display: none;
-}
 .mh-nav-menu .staggered-menu-header {
-  justify-content: flex-end;
-  padding: clamp(0.95rem, 0.6rem + 1.2vw, 1.45rem) clamp(1.1rem, 0.6rem + 1.6vw, 2rem);
-}
-/* Give the toggle a small glass pill so it reads as a button over the hero. */
-.mh-nav-menu .sm-toggle {
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
-  padding: 0.5rem 0.9rem;
-  border-radius: 999px;
-  background: rgba(14, 24, 48, 0.55);
-  border: 1px solid rgba(91, 140, 255, 0.22);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-/* On desktop the inline island links are the primary nav; hide the toggle. */
-@media (min-width: 900px) {
-  .mh-nav-menu .sm-toggle {
-    display: none;
-  }
+  display: none;
 }

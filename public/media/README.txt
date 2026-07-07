@@ -1,21 +1,20 @@
-VIDEOS DE FONDO / ANIMACIÓN
-============================
+VIDEOS / FRAMES DE LAS ANIMACIONES
+===================================
 
-Aquí van los videos que generes con Google Flow (Veo 3.1 Fast).
-Los prompts EXACTOS y el plan están en la carpeta:  /prompts-flow/
+Los prompts y el plan están en la carpeta:  /prompts-flow/
 
-Nombres EXACTOS que espera el sitio:
+PROCESO (segunda animación) — YA INTEGRADO:
+  - El clip de Veo se convirtió en una secuencia de frames para hacer
+    animación de scroll (scroll-scrub) — mucho más ligero y fluido que un
+    video en autoplay, y en teléfono va una tarjeta a la vez refractando el
+    frame de atrás.
+  - Frames en:  proceso-frames/f-001.webp ... f-060.webp  (~1.5 MB en total)
+  - Para regenerarlos desde un mp4 nuevo:
+      ffmpeg -i tu-video.mp4 -vf "fps=7.5,scale=1000:-2:flags=lanczos" \
+        -c:v libwebp -q:v 70 public/media/proceso-frames/f-%03d.webp
+    (deja 60 frames; si cambias la cantidad, ajusta FRAME_COUNT en
+     src/components/home/ProcesoShowcase.jsx)
 
-  servicios.mp4       -> Video 1 (SERVICIOS). Es la animación de la laptop.
-                         Si generaste 2 clips de 8s, únelos en un solo mp4 de 16s
-                         y guárdalo así. (O mándame los 2 clips y yo los uno.)
-                         OJO: esta reemplaza la animación programada actual — avísame
-                         cuando lo tengas y yo hago el cambio en el código.
-
-  proceso-loop.mp4    -> Video 2 (PROCESO). Fondo en loop detrás de las tarjetas
-                         de vidrio. Entra automáticamente, no borro nada.
-
-Formato:
-  - MP4 (H.264), 1920x1080, 16:9 horizontal
-  - Sin audio · < 8 MB por archivo (comprímelo, es fondo)
-  - Composición centrada (ver la regla de encuadre en /prompts-flow/README.md)
+SERVICIOS (primera animación):
+  - Sin video (usa la laptop programada). Si algún día generas uno que te
+    guste, lo integramos igual como scroll-scrub.

@@ -2,10 +2,11 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
-// Big animated brand sign-off. On desktop it's the react-bits ASCIIText (WebGL,
-// recolored blue). On mobile it was heavy AND rendered cut off — so phones get
-// the full brand wordmark as a clean chrome-gradient headline (complete,
-// centered, light). Desktop mounts the WebGL only when scrolled near it.
+// Big animated brand sign-off (react-bits ASCIIText, WebGL, recolored blue).
+// Runs on desktop AND mobile now (client wants the full animation on phones,
+// not a flat wordmark) — on mobile the plane is scaled down + the ascii grid is
+// coarser so the whole "MH Astral Systems" fits and stays light. Reduced-motion
+// still gets the clean static wordmark. WebGL mounts only when scrolled near.
 const ASCIIText = lazy(() => import('../reactbits/ASCIIText'));
 
 function StaticWordmark() {
@@ -23,7 +24,7 @@ export default function AsciiOutro() {
   const [near, setNear] = useState(false);
   const reduced = usePrefersReducedMotion();
   const isMobile = useIsMobile();
-  const useAscii = !reduced && !isMobile;
+  const useAscii = !reduced;
 
   useEffect(() => {
     if (!useAscii) return;
@@ -41,7 +42,7 @@ export default function AsciiOutro() {
     <section
       ref={holderRef}
       aria-label="MH Astral Systems"
-      className="relative mt-section h-[30vh] min-h-[180px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
+      className="relative mt-section h-[34vh] min-h-[210px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
     >
       {!useAscii ? (
         <StaticWordmark />
@@ -50,10 +51,10 @@ export default function AsciiOutro() {
           <ASCIIText
             text="MH Astral Systems"
             enableWaves
-            asciiFontSize={12}
-            textFontSize={170}
+            asciiFontSize={isMobile ? 6 : 12}
+            textFontSize={isMobile ? 100 : 170}
             textColor="#BFD6FF"
-            planeBaseHeight={9}
+            planeBaseHeight={isMobile ? 4.6 : 9}
           />
         </Suspense>
       ) : (

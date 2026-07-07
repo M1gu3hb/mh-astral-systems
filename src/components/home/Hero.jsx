@@ -7,24 +7,21 @@ import { whatsappLink, WA_MESSAGES } from '../../lib/whatsapp';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
-// Beams (react-bits) — desktop hero background. Heavy three.js, so: lazy chunk,
-// desktop-only (mobile gets a light animated gradient instead), transparent
-// canvas over a blue base so there's never a dead-black gap.
+// Beams (react-bits) — the hero background on desktop AND mobile (client wants
+// the new bg everywhere). Heavy three.js → lazy chunk (preloaded in the splash);
+// transparent canvas over a blue base so there's never a dead-black gap.
 const Beams = lazy(() => import('../reactbits/Beams'));
 
-// Curated, similar-length service words. Fixed-width pill (below) means none of
-// these resize the layout when they rotate — no more page "stretch".
 const ROTATING_SERVICES = ['páginas web', 'panel propio', 'POS y CRM', 'menús QR', 'dashboards'];
 
-// rich brand base — always present so beams' dark gaps read blue, never black
 const BRAND_BASE =
   'radial-gradient(55% 60% at 76% 18%, rgba(30,91,255,0.34), transparent 62%),' +
   'radial-gradient(50% 65% at 8% 92%, rgba(10,31,85,0.6), transparent 60%),' +
   'linear-gradient(135deg, #0a1533 0%, #070B16 52%, #0b1c40 100%)';
 
-function LogoHero({ reduced }) {
+function LogoHero({ reduced, className = 'max-w-[13rem] sm:max-w-[17rem] lg:max-w-[26rem]' }) {
   return (
-    <div className="relative mx-auto grid aspect-square w-full max-w-[13rem] place-items-center sm:max-w-[17rem] lg:max-w-[26rem]">
+    <div className={`relative mx-auto grid aspect-square w-full place-items-center ${className}`}>
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(30,91,255,0.35),transparent_62%)] blur-2xl animate-glow-breathe" />
 
       {!reduced && (
@@ -94,21 +91,18 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-16">
-      {/* background */}
+      {/* background — Beams (new bg) on desktop + mobile; static only for reduced motion */}
       <div className="absolute inset-0 -z-10">
-        {/* rich brand base — always: no dead-black gaps */}
         <div className="absolute inset-0" style={{ background: BRAND_BASE }} />
-
-        {/* desktop: Beams. mobile: light floating aurora blobs (smooth, cheap) */}
-        {!reduced && !isMobile && (
+        {!reduced && (
           <Suspense fallback={null}>
             <div className="absolute inset-0">
               <Beams
                 beamWidth={2.4}
                 beamHeight={20}
-                beamNumber={12}
+                beamNumber={isMobile ? 9 : 12}
                 lightColor="#3B72FF"
-                speed={1.6}
+                speed={isMobile ? 1.3 : 1.6}
                 noiseIntensity={1.5}
                 scale={0.2}
                 rotation={26}
@@ -116,20 +110,25 @@ export default function Hero() {
             </div>
           </Suspense>
         )}
-        {!reduced && isMobile && (
-          <>
-            <span className="absolute -right-16 top-6 h-72 w-72 rounded-full bg-electric-600/25 blur-3xl animate-float-slow" />
-            <span className="absolute -left-10 bottom-4 h-64 w-64 rounded-full bg-electric-900/50 blur-3xl [animation:float-slow_9s_ease-in-out_infinite]" />
-          </>
-        )}
-
         <div className="absolute inset-0 bg-circuit opacity-[0.28]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/35 via-void/25 to-void" />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/35 via-void/28 to-void" />
       </div>
 
-      <div className="container-mh flex flex-col items-center gap-7 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-6">
-        {/* copy */}
-        <motion.div variants={container} initial="hidden" animate="show" className="order-2 flex max-w-xl flex-col gap-6 lg:order-1">
+      {/* MOBILE: circular logo sits BEHIND the phrases */}
+      <div className="pointer-events-none absolute inset-0 z-0 grid place-items-center lg:hidden" aria-hidden="true">
+        <div className="w-[min(82vw,20rem)] -translate-y-[6%] opacity-[0.42]">
+          <LogoHero reduced={reduced} className="max-w-none" />
+        </div>
+      </div>
+
+      <div className="container-mh relative z-10 flex flex-col items-center gap-7 text-center lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-6 lg:text-left">
+        {/* copy — centered on mobile, left on desktop */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="order-2 flex max-w-xl flex-col items-center gap-6 lg:order-1 lg:items-start"
+        >
           <motion.span
             variants={item}
             className="inline-flex w-fit items-center gap-2.5 rounded-full border border-electric-600/25 bg-electric-900/20 px-3.5 py-1.5 font-mono text-[0.62rem] uppercase tracking-[0.28em] text-electric-400 backdrop-blur-sm"
@@ -138,8 +137,8 @@ export default function Hero() {
             {HERO.eyebrow}
           </motion.span>
 
-          {/* headline with the rotating service chip (fixed-width pill = no reflow) */}
-          <h1 className="flex flex-col gap-2">
+          {/* headline — centered on mobile (aligns with the centered rotating pill) */}
+          <h1 className="flex flex-col items-center gap-2 lg:items-start">
             <motion.span variants={item} className="text-hero font-medium text-silver-dim">
               Digitaliza tu negocio con
             </motion.span>
@@ -169,7 +168,7 @@ export default function Hero() {
             {HERO.sub}
           </motion.p>
 
-          <motion.div variants={item} className="mt-1 flex flex-wrap items-center gap-3">
+          <motion.div variants={item} className="mt-1 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
             <a
               className="btn btn-primary pr-2"
               href={whatsappLink(WA_MESSAGES.general)}
@@ -189,25 +188,27 @@ export default function Hero() {
             </a>
           </motion.div>
 
-          <motion.p variants={item} className="flex items-center gap-2.5 pt-1 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-silver-faint">
+          <motion.p
+            variants={item}
+            className="flex flex-wrap items-center justify-center gap-2.5 pt-1 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-silver-faint lg:justify-start"
+          >
             <span className="text-electric-400">04 sistemas en producción</span>
             <span className="h-1 w-1 rounded-full bg-silver-faint/50" />
             <span>negocios reales · CDMX</span>
           </motion.p>
         </motion.div>
 
-        {/* real-logo centerpiece */}
+        {/* DESKTOP: the logo centerpiece in its own column */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="relative order-1 lg:order-2"
+          className="relative order-1 hidden lg:order-2 lg:block"
         >
           <LogoHero reduced={reduced} />
         </motion.div>
       </div>
 
-      {/* scroll cue */}
       {!reduced && (
         <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex" aria-hidden="true">
           <span className="font-mono text-[0.55rem] uppercase tracking-[0.4em] text-silver-faint">Scroll</span>

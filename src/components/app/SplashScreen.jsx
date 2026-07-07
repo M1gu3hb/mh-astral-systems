@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import PixelSquares from '../ui/PixelSquares';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { isMobileNow } from '../../hooks/useIsMobile';
 
 // Entry splash. It genuinely PRELOADS the site before revealing it (client
 // request: "cargar todo en el inicio"): every Proceso scroll-scrub frame, the
@@ -40,11 +39,10 @@ function preloadEverything() {
   tasks.push(new Promise((r) => { logo.onload = r; logo.onerror = r; }));
   logo.src = '/logo.png';
 
-  // heavy WebGL chunks — only where they actually render (desktop)
-  if (!isMobileNow()) {
-    tasks.push(import('../reactbits/Beams').catch(() => {}));
-    tasks.push(import('../reactbits/ASCIIText').catch(() => {}));
-  }
+  // heavy WebGL chunks — now rendered on mobile too (hero Beams + ASCII outro),
+  // so preload them everywhere so nothing re-downloads or janks after entry.
+  tasks.push(import('../reactbits/Beams').catch(() => {}));
+  tasks.push(import('../reactbits/ASCIIText').catch(() => {}));
 
   return Promise.allSettled(tasks);
 }

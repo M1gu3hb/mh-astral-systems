@@ -1,5 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import ScrollStack, { ScrollStackItem } from '../reactbits/ScrollStack';
+import CardSwap, { Card } from '../reactbits/CardSwap';
 import ScreenMock from './ScreenMock';
 import SectionHeading from '../ui/SectionHeading';
 import Reveal from '../ui/Reveal';
@@ -7,116 +8,157 @@ import { SERVICIOS } from '../../data/servicios';
 import { SITE } from '../../data/site';
 import { whatsappLink, WA_MESSAGES } from '../../lib/whatsapp';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
-// Services as a ScrollStack (client request): full cards that stack on top of
-// each other as you scroll. Each card = service title + how it helps the
-// business + a little animated app-mock beside it (ScreenMock, floating).
-function CardContent({ s, i }) {
+// Services showcase (client request): the scroll-stack was swapped for React Bits
+// CardSwap — an auto-cycling 3D deck. Left column explains + CTA, right column is
+// the deck cycling one service at a time (title + app preview + benefit line).
+const TOTAL = SERVICIOS.length;
+
+function SvcCard({ s, i }) {
   const Icon = s.icon;
   return (
-    <div className="grid h-full items-center gap-6 md:grid-cols-[1.05fr_0.95fr]">
-      {/* info */}
-      <div className="flex min-w-0 flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
-          <span
-            className={`grid h-12 w-12 flex-none place-items-center rounded-xl border ${
-              s.highlight ? 'border-electric-400/60 bg-electric-600/20' : 'border-electric-600/35 bg-void/50'
-            }`}
-          >
-            <Icon size={22} strokeWidth={1.5} className="text-electric-400" aria-hidden="true" />
-          </span>
-          <span className="font-mono text-[0.65rem] tracking-[0.24em] text-silver-faint">
-            {String(i + 1).padStart(2, '0')} / {String(SERVICIOS.length).padStart(2, '0')}
-          </span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-display text-xl font-semibold leading-tight text-white sm:text-2xl">{s.label}</h3>
-          {s.highlight && (
-            <span className="rounded-full border border-electric-400/40 bg-electric-600/20 px-2 py-0.5 font-mono text-[0.58rem] uppercase tracking-wider text-electric-400">
-              Destacado
-            </span>
-          )}
-        </div>
-
-        <p className="text-sm leading-relaxed text-silver-dim">{s.desc}</p>
-
-        <div className="mt-1 border-l-2 border-electric-600/60 pl-3">
-          <p className="font-mono text-[0.6rem] uppercase tracking-[0.22em] text-electric-400">
-            Cómo ayuda a tu negocio
-          </p>
-          <p className="mt-1 text-sm leading-relaxed text-white/85">{s.ayuda}</p>
-        </div>
-
-        <a
-          href={whatsappLink(s.highlight ? WA_MESSAGES.panel : WA_MESSAGES.general)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group mt-1 inline-flex w-fit items-center gap-1.5 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-electric-400 transition-colors duration-300 hover:text-white"
+    <div className="flex h-full flex-col p-5">
+      <div className="flex items-center justify-between gap-3">
+        <span
+          className={`grid h-11 w-11 flex-none place-items-center rounded-xl border ${
+            s.highlight ? 'border-electric-400/60 bg-electric-600/20' : 'border-electric-600/35 bg-void/60'
+          }`}
         >
-          Lo quiero para mi negocio
-          <ArrowUpRight
-            size={13}
-            strokeWidth={1.75}
-            className="transition-transform duration-300 ease-out-brand group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
-        </a>
+          <Icon size={20} strokeWidth={1.5} className="text-electric-400" aria-hidden="true" />
+        </span>
+        <span className="font-mono text-[0.62rem] tracking-[0.24em] text-silver-faint">
+          {String(i + 1).padStart(2, '0')} / {String(TOTAL).padStart(2, '0')}
+        </span>
       </div>
 
-      {/* little animation beside the card: floating app-mock screen */}
-      <div className="relative hidden sm:block">
-        <div className="absolute -inset-4 rounded-[2rem] bg-electric-600/10 blur-2xl" aria-hidden="true" />
-        <div className="relative animate-float-slow overflow-hidden rounded-2xl border border-white/12 bg-void shadow-[0_30px_80px_-30px_rgba(30,91,255,0.45)]">
-          <div className="aspect-[16/10] w-full">
-            <ScreenMock i={i} />
-          </div>
-          {/* soft scanline sweep to make it feel alive */}
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-16 animate-scanline bg-gradient-to-b from-transparent via-electric-400/10 to-transparent [animation-duration:4.5s] [animation-iteration-count:infinite]"
-          />
+      <div className="mt-3 flex items-start gap-2">
+        <h3 className="font-display text-base font-semibold leading-tight text-white sm:text-lg">{s.label}</h3>
+        {s.highlight && (
+          <span className="mt-0.5 flex-none rounded-full border border-electric-400/40 bg-electric-600/20 px-2 py-0.5 font-mono text-[0.5rem] uppercase tracking-wider text-electric-400">
+            Nuevo
+          </span>
+        )}
+      </div>
+
+      {/* app preview */}
+      <div className="relative mt-3 min-h-0 flex-1 overflow-hidden rounded-xl border border-white/10 bg-void">
+        <ScreenMock i={i} />
+      </div>
+
+      <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-silver-dim">{s.ayuda}</p>
+    </div>
+  );
+}
+
+// The deck (WebGL-adjacent GSAP 3D + 8 app previews) only runs while the section
+// is on screen — otherwise it burns the GPU offscreen and janks the whole page.
+function useOnScreen(margin = '250px') {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: margin });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [margin]);
+  return [ref, visible];
+}
+
+function DeckFront() {
+  // static first card while the deck is parked (before it scrolls into view)
+  return (
+    <div className="absolute left-1/2 top-1/2 w-[258px] max-w-[80vw] -translate-x-1/2 -translate-y-1/2 sm:w-[340px]">
+      <div className="overflow-hidden rounded-[20px] border border-electric-400/40 bg-gradient-to-b from-panel to-void shadow-[0_30px_80px_-30px_rgba(30,91,255,0.5)]">
+        <div className="h-[320px] sm:h-[392px]">
+          <SvcCard s={SERVICIOS[0]} i={0} />
         </div>
       </div>
     </div>
   );
 }
 
-function StackShowcase() {
-  return (
-    <section id="servicios" className="scroll-mt-28 pt-section">
-      <div className="container-mh">
-        <SectionHeading
-          index="01"
-          eyebrow="Qué hago"
-          title="Servicios que trabajan por tu negocio"
-          lead={SITE.support}
-        />
-      </div>
+function ServiciosShowcase() {
+  const [deckRef, deckOn] = useOnScreen();
+  const isMobile = useIsMobile();
+  const deck = isMobile
+    ? { width: 258, height: 320, cardDistance: 22, verticalDistance: 28 }
+    : { width: 340, height: 392, cardDistance: 46, verticalDistance: 54 };
 
-      <div className="container-mh">
-        <ScrollStack
-          className="mh-stack"
-          useWindowScroll
-          itemDistance={90}
-          itemScale={0.028}
-          itemStackDistance={14}
-          stackPosition="16%"
-          scaleEndPosition="8%"
-          baseScale={0.86}
-          blurAmount={1}
-        >
-          {SERVICIOS.map((s, i) => (
-            <ScrollStackItem key={s.label} itemClassName="glass-card">
-              <CardContent s={s} i={i} />
-            </ScrollStackItem>
-          ))}
-        </ScrollStack>
+  return (
+    <section id="servicios" className="scroll-mt-28 overflow-hidden py-section">
+      <div className="container-mh grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:gap-12">
+        {/* left — explain + icon legend + CTA */}
+        <div>
+          <SectionHeading
+            index="01"
+            eyebrow="Qué hago"
+            title="Servicios que trabajan por tu negocio"
+            lead={SITE.support}
+          />
+
+          <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Servicios disponibles">
+            {SERVICIOS.map((s) => {
+              const Icon = s.icon;
+              return (
+                <li
+                  key={s.label}
+                  title={s.label}
+                  className={`grid h-11 w-11 place-items-center rounded-xl border transition-colors duration-300 ${
+                    s.highlight
+                      ? 'border-electric-400/60 bg-electric-600/20'
+                      : 'border-white/10 bg-void-2/50 hover:border-electric-600/45'
+                  }`}
+                >
+                  <Icon size={19} strokeWidth={1.5} className="text-electric-400" aria-hidden="true" />
+                </li>
+              );
+            })}
+          </ul>
+
+          <a
+            href={whatsappLink(WA_MESSAGES.general)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary mt-9 pr-2"
+          >
+            <span>Cuéntame tu proyecto</span>
+            <span className="btn-orb bg-white/15">
+              <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
+            </span>
+          </a>
+        </div>
+
+        {/* right — auto-cycling deck (mounts only while on screen) */}
+        <div ref={deckRef} className="mh-cardswap relative min-h-[380px] sm:min-h-[520px]">
+          {deckOn ? (
+            <CardSwap
+              width={deck.width}
+              height={deck.height}
+              cardDistance={deck.cardDistance}
+              verticalDistance={deck.verticalDistance}
+              delay={3600}
+              pauseOnHover
+              skewAmount={5}
+              easing="elastic"
+            >
+              {SERVICIOS.map((s, i) => (
+                <Card key={s.label} customClass="mh-svc-card">
+                  <SvcCard s={s} i={i} />
+                </Card>
+              ))}
+            </CardSwap>
+          ) : (
+            <DeckFront />
+          )}
+        </div>
       </div>
     </section>
   );
 }
 
-// Reduced-motion fallback: plain readable list, no pinning/stacking.
+// Reduced-motion fallback: plain readable list, no auto-motion.
 function StaticList() {
   return (
     <section id="servicios" className="scroll-mt-28 py-section">
@@ -127,11 +169,11 @@ function StaticList() {
           title="Servicios que trabajan por tu negocio"
           lead={SITE.support}
         />
-        <div className="mt-10 flex flex-col gap-5">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2">
           {SERVICIOS.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.03}>
-              <div className="glass-card p-6 sm:p-8">
-                <CardContent s={s} i={i} />
+              <div className="glass-card h-full overflow-hidden rounded-2xl">
+                <SvcCard s={s} i={i} />
               </div>
             </Reveal>
           ))}
@@ -143,5 +185,5 @@ function StaticList() {
 
 export default function ServiciosStack() {
   const reduced = usePrefersReducedMotion();
-  return reduced ? <StaticList /> : <StackShowcase />;
+  return reduced ? <StaticList /> : <ServiciosShowcase />;
 }

@@ -1,0 +1,50 @@
+/* React Bits — CardSwap. Base positioning kept; recolored to the MH brand
+   (docs/10). The container is centered inside its wrapper (.mh-cardswap) instead
+   of the library default bottom-right corner, so the deck reads as a centered
+   showcase in the services section. */
+.card-swap-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  perspective: 1400px;
+  overflow: visible;
+}
+
+.card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 20px;
+  border: 1px solid rgba(91, 140, 255, 0.22);
+  background: linear-gradient(160deg, rgba(14, 24, 48, 0.96), rgba(7, 11, 22, 0.98));
+  box-shadow:
+    0 30px 80px -30px rgba(30, 91, 255, 0.5),
+    inset 0 1px 0 rgba(191, 214, 255, 0.08);
+
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* the front card gets a brighter edge so the top of the deck pops */
+.card:first-child {
+  border-color: rgba(91, 140, 255, 0.4);
+}
+
+/* Center the deck within the section column. Sizing is handled per-breakpoint in
+   JS (compact width/distance on mobile), so here we only recenter — and on phones
+   nudge the deck down a touch so the up-right fan keeps clear of the copy above. */
+@media (max-width: 1023px) {
+  .card-swap-container {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@media (max-width: 640px) {
+  .card-swap-container {
+    transform: translate(-50%, -42%) scale(1);
+  }
+}

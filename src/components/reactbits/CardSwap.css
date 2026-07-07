@@ -45,8 +45,8 @@
 
 @media (max-width: 640px) {
   .card-swap-container {
-    /* deck centred in its box; legend + CTA sit below it so the upward fan
-       never covers them */
-    transform: translate(-50%, -48%) scale(1);
+    /* nudged DOWN in its box so the upward-fanning cards stay clear of the
+       icon + CTA cluster that sits above the deck */
+    transform: translate(-50%, -34%) scale(1);
   }
 }

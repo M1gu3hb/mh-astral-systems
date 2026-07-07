@@ -37,10 +37,15 @@ function OrbitComet({ flip = false }) {
 // clears the name), a slight screen-plane rotation for scatter, and one traveller.
 const ORBIT_RINGS = [
   { size: 'min(150vw, 660px)', tilt: 72, rz: -6, dur: 26, rev: false, delay: '0s', obj: <OrbitComet /> },
+  { size: 'min(168vw, 750px)', tilt: 73, rz: 4, dur: 31, rev: true, delay: '-5s', obj: <OrbitStar cls="h-1.5 w-1.5 bg-electric-400" /> },
   { size: 'min(175vw, 800px)', tilt: 74, rz: 5, dur: 36, rev: true, delay: '-9s', obj: <OrbitStar /> },
+  { size: 'min(158vw, 700px)', tilt: 75, rz: -9, dur: 28, rev: false, delay: '-13s', obj: <OrbitComet flip /> },
   { size: 'min(200vw, 940px)', tilt: 70, rz: -3, dur: 46, rev: false, delay: '-16s', obj: <OrbitStar cls="h-1 w-1 bg-white" /> },
-  { size: 'min(162vw, 720px)', tilt: 76, rz: 9, dur: 30, rev: true, delay: '-22s', obj: <OrbitComet flip /> },
+  { size: 'min(186vw, 870px)', tilt: 72, rz: 8, dur: 40, rev: true, delay: '-19s', obj: <OrbitStar cls="h-1 w-1 bg-chrome-highlight" /> },
+  { size: 'min(162vw, 720px)', tilt: 76, rz: 9, dur: 30, rev: true, delay: '-22s', obj: <OrbitComet /> },
   { size: 'min(215vw, 1060px)', tilt: 71, rz: 0, dur: 54, rev: false, delay: '-32s', obj: <OrbitStar cls="h-1 w-1 bg-electric-400" /> },
+  { size: 'min(230vw, 1150px)', tilt: 69, rz: -5, dur: 62, rev: true, delay: '-40s', obj: <OrbitComet flip /> },
+  { size: 'min(142vw, 620px)', tilt: 77, rz: 12, dur: 24, rev: false, delay: '-44s', obj: <OrbitStar cls="h-1.5 w-1.5 bg-chrome-highlight" /> },
 ];
 
 function AstralOrbits() {
@@ -123,7 +128,7 @@ export default function AsciiOutro() {
     <section
       ref={holderRef}
       aria-label="MH Astral Systems"
-      className="relative mt-section h-[38vh] min-h-[260px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
+      className="relative mt-0 h-[38vh] min-h-[260px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
     >
       {!reduced && near && <AstralOrbits />}
 

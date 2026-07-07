@@ -31,7 +31,7 @@ const CLAY_CHIP = {
 function ClayBody({ step, index }) {
   const Icon = ICONS[index];
   return (
-    <div className="relative flex flex-col gap-4 p-7 sm:p-8">
+    <div className="relative flex flex-col gap-5 p-8 sm:p-9">
       {/* soft clay sheen */}
       <span
         aria-hidden="true"
@@ -40,11 +40,11 @@ function ClayBody({ step, index }) {
       />
 
       <div className="flex items-center justify-between">
-        <span className="grid h-14 w-14 place-items-center rounded-2xl" style={CLAY_CHIP}>
-          <Icon size={23} strokeWidth={1.5} className="text-white drop-shadow-[0_2px_4px_rgba(6,16,48,0.6)]" aria-hidden="true" />
+        <span className="grid h-16 w-16 place-items-center rounded-2xl" style={CLAY_CHIP}>
+          <Icon size={26} strokeWidth={1.5} className="text-white drop-shadow-[0_2px_4px_rgba(6,16,48,0.6)]" aria-hidden="true" />
         </span>
         <span
-          className="font-display text-5xl font-bold text-transparent sm:text-6xl"
+          className="font-display text-6xl font-bold text-transparent"
           style={{ WebkitTextStroke: '1.5px rgba(91,140,255,0.4)' }}
         >
           {step.n}
@@ -52,8 +52,8 @@ function ClayBody({ step, index }) {
       </div>
 
       <div>
-        <h3 className="font-display text-xl font-semibold text-white sm:text-2xl">{step.titulo}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-silver-dim sm:text-[0.95rem]">{step.desc}</p>
+        <h3 className="font-display text-2xl font-semibold text-white">{step.titulo}</h3>
+        <p className="mt-2 text-[0.95rem] leading-relaxed text-silver-dim sm:text-base">{step.desc}</p>
       </div>
 
       {/* caption strip (kept from the source component, restyled) */}
@@ -79,7 +79,7 @@ function StickyClayCard({ i, step, progress, range, targetScale }) {
     <div className="sticky top-0 flex h-[100svh] items-center justify-center">
       <motion.div
         style={{ scale, rotate: rotation, top: `${i * 26 - 44}px`, ...CLAY_CARD }}
-        className="relative w-[min(88vw,520px)] origin-top overflow-hidden rounded-[30px]"
+        className="relative w-[min(93vw,560px)] origin-top overflow-hidden rounded-[32px]"
       >
         <ClayBody step={step} index={i} />
       </motion.div>
@@ -110,8 +110,9 @@ function Showcase() {
         </span>
       </div>
 
-      {/* the stacking deck */}
-      <div className="relative pb-[46vh]">
+      {/* the stacking deck — minimal trailing space so it flows straight into
+          the sign-off (no dead gap that reads like the page ended) */}
+      <div className="relative pb-[8vh]">
         {PROCESO.map((step, i) => (
           <StickyClayCard
             key={step.n}

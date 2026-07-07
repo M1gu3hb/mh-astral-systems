@@ -92,21 +92,121 @@ function DeckFront() {
   );
 }
 
+function Legend({ activeIdx, goTo, className = '' }) {
+  return (
+    <ul className={`flex flex-wrap gap-2.5 ${className}`} aria-label="Servicios — toca para verlo en el mazo">
+      {SERVICIOS.map((s, i) => {
+        const Icon = s.icon;
+        const isActive = i === activeIdx;
+        return (
+          <li key={s.label}>
+            <button
+              type="button"
+              title={s.label}
+              aria-label={s.label}
+              aria-pressed={isActive}
+              onClick={() => goTo(i)}
+              className={`grid h-12 w-12 place-items-center rounded-xl border transition-all duration-300 ${
+                isActive
+                  ? 'scale-105 border-electric-400/70 bg-electric-600/25 shadow-glow-soft'
+                  : 'border-white/10 bg-void-2/50 hover:-translate-y-0.5 hover:border-electric-600/50'
+              }`}
+            >
+              <Icon
+                size={20}
+                strokeWidth={1.5}
+                className={isActive ? 'text-chrome-highlight' : 'text-electric-400'}
+                aria-hidden="true"
+              />
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function CtaButton({ className = '' }) {
+  return (
+    <a
+      href={whatsappLink(WA_MESSAGES.general)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`btn btn-primary pr-2 ${className}`}
+    >
+      <span>Cuéntame tu proyecto</span>
+      <span className="btn-orb bg-white/15">
+        <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
+      </span>
+    </a>
+  );
+}
+
 function ServiciosShowcase() {
   const [deckRef, deckOn] = useOnScreen();
   const isMobile = useIsMobile();
   const deckApi = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const deck = isMobile
-    ? { width: 300, height: 356, cardDistance: 26, verticalDistance: 30 }
+    ? { width: 300, height: 356, cardDistance: 24, verticalDistance: 28 }
     : { width: 468, height: 432, cardDistance: 52, verticalDistance: 52 };
 
   const goTo = (i) => deckApi.current?.goTo(i);
 
+  const deckEl = (
+    <div ref={deckRef} className="mh-cardswap relative min-h-[470px] sm:min-h-[560px]">
+      {deckOn ? (
+        <CardSwap
+          ref={deckApi}
+          width={deck.width}
+          height={deck.height}
+          cardDistance={deck.cardDistance}
+          verticalDistance={deck.verticalDistance}
+          delay={4200}
+          pauseOnHover
+          skewAmount={5}
+          easing="elastic"
+          onIndexChange={setActiveIdx}
+          onCardClick={goTo}
+        >
+          {SERVICIOS.map((s, i) => (
+            <Card key={s.label} customClass="mh-svc-card cursor-pointer">
+              <SvcCard s={s} i={i} />
+            </Card>
+          ))}
+        </CardSwap>
+      ) : (
+        <DeckFront />
+      )}
+    </div>
+  );
+
+  // MOBILE — single column: heading → deck → legend → CTA. Legend and CTA sit
+  // BELOW the deck so the fanned cards (which reach upward) never cover them, and
+  // tapping a legend icon reliably calls its own card.
+  if (isMobile) {
+    return (
+      <section id="servicios" className="scroll-mt-28 overflow-hidden py-section">
+        <div className="container-mh flex flex-col items-center text-center">
+          <SectionHeading
+            align="center"
+            index="01"
+            eyebrow="Qué hago"
+            title="Servicios que trabajan por tu negocio"
+            lead={SITE.support}
+          />
+          <div className="mt-6 w-full">{deckEl}</div>
+          <Legend activeIdx={activeIdx} goTo={goTo} className="mt-2 justify-center" />
+          <CtaButton className="mt-8" />
+        </div>
+      </section>
+    );
+  }
+
+  // DESKTOP — two columns: text + legend + CTA on the left, deck on the right.
   return (
     <section id="servicios" className="scroll-mt-28 overflow-hidden py-section">
       <div className="container-mh grid gap-14 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-14">
-        {/* left — explain + icon legend + CTA */}
         <div>
           <SectionHeading
             index="01"
@@ -114,77 +214,10 @@ function ServiciosShowcase() {
             title="Servicios que trabajan por tu negocio"
             lead={SITE.support}
           />
-
-          <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Servicios — toca para verlo en el mazo">
-            {SERVICIOS.map((s, i) => {
-              const Icon = s.icon;
-              const isActive = i === activeIdx;
-              return (
-                <li key={s.label}>
-                  <button
-                    type="button"
-                    title={s.label}
-                    aria-label={s.label}
-                    aria-pressed={isActive}
-                    onClick={() => goTo(i)}
-                    className={`grid h-12 w-12 place-items-center rounded-xl border transition-all duration-300 ${
-                      isActive
-                        ? 'scale-105 border-electric-400/70 bg-electric-600/25 shadow-glow-soft'
-                        : 'border-white/10 bg-void-2/50 hover:-translate-y-0.5 hover:border-electric-600/50'
-                    }`}
-                  >
-                    <Icon
-                      size={20}
-                      strokeWidth={1.5}
-                      className={isActive ? 'text-chrome-highlight' : 'text-electric-400'}
-                      aria-hidden="true"
-                    />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-
-          <a
-            href={whatsappLink(WA_MESSAGES.general)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary mt-9 pr-2"
-          >
-            <span>Cuéntame tu proyecto</span>
-            <span className="btn-orb bg-white/15">
-              <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
-            </span>
-          </a>
+          <Legend activeIdx={activeIdx} goTo={goTo} className="mt-8" />
+          <CtaButton className="mt-9" />
         </div>
-
-        {/* right — auto-cycling deck (mounts only while on screen); click a card
-            or a legend icon to bring that service to the front */}
-        <div ref={deckRef} className="mh-cardswap relative min-h-[400px] sm:min-h-[560px]">
-          {deckOn ? (
-            <CardSwap
-              ref={deckApi}
-              width={deck.width}
-              height={deck.height}
-              cardDistance={deck.cardDistance}
-              verticalDistance={deck.verticalDistance}
-              delay={4200}
-              pauseOnHover
-              skewAmount={5}
-              easing="elastic"
-              onIndexChange={setActiveIdx}
-              onCardClick={goTo}
-            >
-              {SERVICIOS.map((s, i) => (
-                <Card key={s.label} customClass="mh-svc-card cursor-pointer">
-                  <SvcCard s={s} i={i} />
-                </Card>
-              ))}
-            </CardSwap>
-          ) : (
-            <DeckFront />
-          )}
-        </div>
+        {deckEl}
       </div>
     </section>
   );

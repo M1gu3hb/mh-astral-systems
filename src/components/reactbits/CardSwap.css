@@ -45,6 +45,8 @@
 
 @media (max-width: 640px) {
   .card-swap-container {
-    transform: translate(-50%, -42%) scale(1);
+    /* deck centred in its box; legend + CTA sit below it so the upward fan
+       never covers them */
+    transform: translate(-50%, -48%) scale(1);
   }
 }

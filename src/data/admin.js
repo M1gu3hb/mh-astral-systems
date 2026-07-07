@@ -5,7 +5,7 @@ export const ADMIN_STATS = [
   { label: 'Casos publicados', value: '4', hint: 'SIS-01 … SIS-04' },
   { label: 'Tiers de precio', value: '3', hint: 'Presencia · Autónomo · +IA' },
   { label: 'Posts del blog', value: '3', hint: 'Todos publicados' },
-  { label: 'Clientes con portal', value: '1', hint: 'Confetti (demo)' },
+  { label: 'Clientes con portal', value: '1', hint: 'Negocio demo' },
 ];
 
 // The sections of the admin panel (docs/05 · CRUD sobre las 4 entidades).

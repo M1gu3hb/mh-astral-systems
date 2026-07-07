@@ -157,10 +157,10 @@ function MobileHero({ reduced }) {
       variants={container}
       initial="hidden"
       animate="show"
-      className="container-mh relative z-10 flex flex-col items-center gap-6 text-center"
+      className="container-mh relative z-10 flex flex-col items-center gap-3 self-start text-center"
     >
-      <motion.div variants={item} className="py-1">
-        <LogoHero reduced={reduced} sizeClass="w-[15rem] max-w-[80vw]" />
+      <motion.div variants={item} className="-mt-2">
+        <LogoHero reduced={reduced} sizeClass="w-[14rem] max-w-[76vw]" />
       </motion.div>
 
       <motion.span
@@ -316,7 +316,7 @@ export default function Hero() {
   }, [reduced]);
 
   return (
-    <section ref={sectionRef} className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-20">
+    <section ref={sectionRef} className="relative flex min-h-[100svh] items-center overflow-hidden pt-16 pb-14 sm:pt-28 sm:pb-20">
       {/* background — Beams (new bg) on desktop + mobile; static only for reduced motion */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0" style={{ background: BRAND_BASE }} />

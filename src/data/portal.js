@@ -3,7 +3,7 @@
 // proyectos". Papers inside are the deliverables/links of that project.
 
 export const PORTAL_CLIENT = {
-  nombre: 'Pastelería Confetti',
+  nombre: 'Tu Negocio',
   contacto: 'Área de administración',
   plan: 'Autónomo + IA',
   desde: '2025',

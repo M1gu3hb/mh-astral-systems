@@ -1,17 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useScroll, useTransform, useMotionValueEvent } from 'motion/react';
-import { Search, FileText, Hammer, Rocket } from 'lucide-react';
+import { Search, FileText, Hammer, Rocket, ChevronsDown } from 'lucide-react';
 import { PROCESO } from '../../data/proceso';
 import GlassSurface from '../reactbits/GlassSurface';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
-// Scroll-scrubbed frame sequence (Apple-style): the Veo clip was exported to 60
-// lightweight WebP frames; as you scroll, the matching frame is painted to a
-// <canvas> behind the liquid-glass step cards, which refract it like water.
-// No autoplaying <video> (that was heavy + janky on phones); frames are
-// preloaded only when the section nears the viewport.
-const FRAME_COUNT = 60;
-const frameSrc = (i) => `/media/proceso-frames/f-${String(i + 1).padStart(3, '0')}.webp`;
+// Scroll-driven step reveal. The heavy frame-scrub background was dropped (client:
+// too heavy, didn't love it) — we keep the liquid-glass cards refracting the brand
+// base, and make the "swipe to advance" hint pop.
 const ICONS = [Search, FileText, Hammer, Rocket];
 
 // desktop: each card reveals as scroll crosses its threshold, then stays
@@ -65,10 +61,6 @@ function DesktopCard({ progress, index, step }) {
 
 function Showcase() {
   const sectionRef = useRef(null);
-  const canvasRef = useRef(null);
-  const imgsRef = useRef([]);
-  const rafRef = useRef(0);
-  const lastP = useRef(0);
   const [isMobile, setIsMobile] = useState(false);
   const [active, setActive] = useState(0);
 
@@ -83,103 +75,16 @@ function Showcase() {
     return () => mq.removeEventListener('change', on);
   }, []);
 
-  // draw current frame (cover-fit) to the canvas
-  const drawCover = (img) => {
-    const canvas = canvasRef.current;
-    if (!canvas || !img || !img.complete || !img.naturalWidth) return;
-    const ctx = canvas.getContext('2d');
-    const cw = canvas.width;
-    const ch = canvas.height;
-    const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-    const dw = img.naturalWidth * s;
-    const dh = img.naturalHeight * s;
-    ctx.clearRect(0, 0, cw, ch);
-    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
-  };
-
-  const renderFrame = (p) => {
-    const imgs = imgsRef.current;
-    if (!imgs.length) return;
-    let idx = Math.round(p * (FRAME_COUNT - 1));
-    idx = Math.max(0, Math.min(FRAME_COUNT - 1, idx));
-    let img = imgs[idx];
-    // if the exact frame isn't loaded yet, walk to the nearest loaded one
-    if (!img || !img.complete || !img.naturalWidth) {
-      for (let d = 1; d < FRAME_COUNT; d++) {
-        const a = imgs[idx - d];
-        const b = imgs[idx + d];
-        if (a && a.complete && a.naturalWidth) { img = a; break; }
-        if (b && b.complete && b.naturalWidth) { img = b; break; }
-      }
-    }
-    drawCover(img);
-  };
-
-  // size the canvas to its box (dpr-aware) and redraw
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const resize = () => {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.max(1, Math.round(rect.width * dpr));
-      canvas.height = Math.max(1, Math.round(rect.height * dpr));
-      renderFrame(lastP.current);
-    };
-    resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas.parentElement);
-    return () => ro.disconnect();
-  }, []);
-
-  // preload frames only when the section is near the viewport
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-    let started = false;
-    const startPreload = () => {
-      if (started) return;
-      started = true;
-      const imgs = new Array(FRAME_COUNT);
-      // load first frame immediately so the canvas isn't blank
-      const order = [...Array(FRAME_COUNT).keys()];
-      order.forEach((i) => {
-        const im = new Image();
-        im.decoding = 'async';
-        im.onload = () => {
-          const idxNow = Math.round(lastP.current * (FRAME_COUNT - 1));
-          if (Math.abs(i - idxNow) <= 1 || i === 0) renderFrame(lastP.current);
-        };
-        im.src = frameSrc(i);
-        imgs[i] = im;
-      });
-      imgsRef.current = imgs;
-    };
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && startPreload()),
-      { rootMargin: '900px 0px' },
-    );
-    io.observe(section);
-    return () => io.disconnect();
-  }, []);
-
-  // scroll → frame + active band (rAF-throttled)
+  // scroll → active band (mobile shows one card at a time)
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
-    lastP.current = p;
-    if (!rafRef.current) {
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = 0;
-        renderFrame(lastP.current);
-      });
-    }
     const i = Math.max(0, Math.min(PROCESO.length - 1, Math.floor((p - 0.08) / BAND)));
     setActive(i);
   });
 
   return (
-    <section id="proceso" ref={sectionRef} className="relative h-[230vh] scroll-mt-28 md:h-[300vh]">
+    <section id="proceso" ref={sectionRef} className="relative h-[210vh] scroll-mt-28 md:h-[300vh]">
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden">
-        {/* brand base (shows before frames load) */}
+        {/* brand base — the liquid-glass cards refract this */}
         <div
           className="absolute inset-0"
           style={{
@@ -188,9 +93,8 @@ function Showcase() {
               'linear-gradient(180deg, #070B16, #0B1120 60%, #070B16)',
           }}
         />
-        {/* the scrubbed frame */}
-        <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
-        {/* edge fades so the section blends; center stays visible */}
+        <div className="absolute inset-0 bg-circuit opacity-[0.22]" aria-hidden="true" />
+        {/* edge fades so the section blends */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-void to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-void to-transparent" />
 
@@ -264,9 +168,13 @@ function Showcase() {
             </div>
           )}
 
-          <p className="mt-14 text-center font-mono text-[0.6rem] uppercase tracking-[0.3em] text-silver-faint sm:mt-10">
-            Desliza para avanzar
-          </p>
+          <div className="mt-14 flex justify-center sm:mt-10">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-electric-400/50 bg-electric-600/20 px-5 py-2.5 font-mono text-[0.66rem] font-medium uppercase tracking-[0.28em] text-chrome-highlight shadow-[0_0_28px_-4px_rgba(30,91,255,0.75)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-electric-400 animate-pulse-dot" />
+              Desliza para avanzar
+              <ChevronsDown size={15} strokeWidth={2} className="animate-bounce text-electric-400" aria-hidden="true" />
+            </span>
+          </div>
         </div>
       </div>
     </section>

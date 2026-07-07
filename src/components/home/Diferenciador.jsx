@@ -48,7 +48,7 @@ function RevealBlock({ children, className = '' }) {
 // the public page on the right, and every change syncing live between them on
 // a slow loop — "esto cambia en vivo" without needing interaction (docs/04).
 // Data is fictional — no sensitive client info.
-const PRODUCTO = 'Pastel Tres Leches';
+const PRODUCTO = 'Producto destacado';
 const STATES = [
   { promo: null, precio: '$180', foto: '#0A1F55' },
   { promo: '2x1 los martes', precio: '$150', foto: '#1E5BFF' },
@@ -97,7 +97,7 @@ function PanelSync() {
       <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
         <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-electric-400">
           <span className="h-2 w-2 rounded-full bg-electric-600 animate-pulse-dot" />
-          Panel · Confetti
+          Panel · Tu negocio
         </span>
         <span className="rounded-md border border-electric-600/40 bg-electric-600/15 px-2 py-1 font-mono text-[0.6rem] text-electric-400">
           Editando
@@ -188,7 +188,7 @@ function PanelSync() {
             <span className="h-1.5 w-1.5 rounded-full bg-white/15" />
             <span className="h-1.5 w-1.5 rounded-full bg-white/15" />
             <span className="ml-1 h-3 flex-1 rounded-full bg-white/5 px-2 font-mono text-[0.5rem] leading-3 text-silver-faint">
-              confetti.mx
+              tunegocio.mx
             </span>
           </div>
           <div className="flex items-center gap-3 rounded-lg border border-white/8 bg-void-2/60 p-2.5">
@@ -296,7 +296,7 @@ export default function Diferenciador() {
 
           <RevealBlock>
             <ul className="flex flex-col gap-2 pt-1">
-              {['Editas fotos, precios y promociones tú mismo', 'Nació de la experiencia real con Confetti', 'Se incluye en el tier Autónomo'].map(
+              {['Editas fotos, precios y promociones tú mismo', 'Probado en negocios reales en operación', 'Se incluye en el tier Autónomo'].map(
                 (t) => (
                   <li key={t} className="flex items-center gap-3 text-sm text-silver-dim">
                     <Check size={16} className="flex-none text-electric-400" strokeWidth={2} />

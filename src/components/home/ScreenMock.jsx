@@ -47,7 +47,7 @@ export default function ScreenMock({ i }) {
     // 0 · Panel de autoedición
     case 0:
       return (
-        <Chrome label="confetti.mx/admin">
+        <Chrome label="tunegocio.mx/panel">
           <div className="flex h-full flex-col gap-2">
             <div className="flex items-center gap-2 rounded-lg border border-electric-600/40 bg-electric-900/25 p-2">
               <div className="h-9 w-9 rounded-md bg-gradient-to-br from-electric-600 to-electric-900" />
@@ -98,7 +98,7 @@ export default function ScreenMock({ i }) {
         <Chrome label="POS · Punto de venta">
           <div className="flex h-full gap-2">
             <div className="flex-1 space-y-1.5">
-              {['Café', 'Pastel', 'Jugo'].map((t, k) => (
+              {['Producto', 'Combo', 'Extra'].map((t, k) => (
                 <div key={t} className="flex items-center justify-between rounded-md border border-white/8 bg-void-2/60 px-2 py-1.5">
                   <span className="font-mono text-[9px] text-silver-dim">{t}</span>
                   <span className="font-mono text-[9px] text-electric-400">${(k + 1) * 45}</span>

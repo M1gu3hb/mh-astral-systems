@@ -93,8 +93,6 @@ const CardSwap = forwardRef(function CardSwap(
 
   // How long a hand-picked card sits at the front before auto-cycling resumes.
   const POST_SELECT_DWELL = 2000;
-  // Snappy "pop to front" timing for taps (the auto elastic swap is slower).
-  const NAV = { durDrop: 0.5, durMove: 0.6, durReturn: 0.55, promoteOverlap: 0.7, returnDelay: 0.1, ease: 'power3.out' };
 
   const resumeAfterDwell = () => {
     clearTimeout(timeoutRef.current);
@@ -104,9 +102,11 @@ const CardSwap = forwardRef(function CardSwap(
     }, POST_SELECT_DWELL);
   };
 
-  // Imperative jump: bring `index` to the front using the SAME drop-and-settle
-  // motion the deck uses — the chosen card lifts out and lands on top while the
-  // rest shift back one slot (instead of sliding straight through the stack).
+  // Imperative jump: bring `index` to the front with the deck's own swap motion,
+  // but REVERSED. The chosen card drops down while KEEPING its z, so the cards in
+  // front of it hide it as it sinks (the stacking look the client asked for);
+  // only then does it rise into the front slot. The cards that were ahead of it
+  // shift back one slot; the ones already behind it don't move.
   useImperativeHandle(apiRef, () => ({
     goTo(index) {
       clearTimeout(timeoutRef.current);
@@ -114,39 +114,43 @@ const CardSwap = forwardRef(function CardSwap(
       tlRef.current?.kill();
 
       const total = refs.length;
-      if (order.current[0] === index) {
+      const cur = order.current;
+      const k = cur.indexOf(index);
+      if (k <= 0) {
         resumeAfterDwell();
         return;
       }
 
-      const rest = order.current.filter((i) => i !== index);
-      order.current = [index, ...rest];
+      const ahead = cur.slice(0, k); // cards currently in front of the chosen one
+      const behind = cur.slice(k + 1); // cards already behind it — stay put
+      order.current = [index, ...ahead, ...behind];
       onIndexChangeRef.current?.(index);
 
       const elSel = refs[index].current;
+      const D = 0.5; // drop duration — sinks fully before the z-swap
+      const R = 0.62; // rise duration
+      const M = 0.6; // demote duration
       const tl = gsap.timeline();
       tlRef.current = tl;
 
-      // 1) pop the chosen card out toward the viewer
-      tl.set(elSel, { zIndex: total + 2 });
-      tl.to(elSel, { y: '+=500', duration: NAV.durDrop, ease: NAV.ease });
+      // 1) the chosen card sinks straight DOWN keeping its z — the front cards
+      //    hide it as it drops (the "stacking, in reverse" the client wants)
+      tl.to(elSel, { y: '+=520', duration: D, ease: 'power2.in' }, 0);
 
-      // 2) slide the rest back one slot (1..n) as it lifts
-      tl.addLabel('promote', `-=${NAV.durDrop * NAV.promoteOverlap}`);
-      rest.forEach((idx, i) => {
+      // 2) the cards that were ahead of it slide back one slot (0..k-1 -> 1..k)
+      ahead.forEach((idx, i) => {
         const el = refs[idx].current;
         const slot = makeSlot(i + 1, cardDistance, verticalDistance, total);
-        tl.set(el, { zIndex: slot.zIndex }, 'promote');
-        tl.to(el, { x: slot.x, y: slot.y, z: slot.z, duration: NAV.durMove, ease: NAV.ease }, `promote+=${i * 0.05}`);
+        tl.set(el, { zIndex: slot.zIndex }, 0.1);
+        tl.to(el, { x: slot.x, y: slot.y, z: slot.z, duration: M, ease: 'power2.out' }, 0.1 + i * 0.05);
       });
 
-      // 3) settle the chosen card into the front slot
-      const front = makeSlot(0, cardDistance, verticalDistance, total);
-      tl.addLabel('return', `promote+=${NAV.durMove * NAV.returnDelay}`);
-      tl.set(elSel, { zIndex: front.zIndex }, 'return');
-      tl.to(elSel, { x: front.x, y: front.y, z: front.z, duration: NAV.durReturn, ease: 'back.out(1.3)' }, 'return');
+      // 3) ONLY after it's fully dropped out of sight, raise its z and float it up
+      const frontSlot = makeSlot(0, cardDistance, verticalDistance, total);
+      tl.call(() => gsap.set(elSel, { zIndex: frontSlot.zIndex }), undefined, D);
+      tl.to(elSel, { x: frontSlot.x, y: frontSlot.y, z: frontSlot.z, duration: R, ease: 'back.out(1.4)' }, D);
 
-      // 4) hold briefly, then resume auto-cycling
+      // 4) hold ~2s at the front, then resume auto-cycling
       tl.call(resumeAfterDwell);
     },
   }));

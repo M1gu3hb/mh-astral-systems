@@ -5,32 +5,15 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { isMobileNow } from '../../hooks/useIsMobile';
 
 // Entry splash. It genuinely PRELOADS the site before revealing it (client
-// request: "cargar todo en el inicio"): every Proceso scroll-scrub frame, the
-// fonts, and — on desktop — the heavy three.js chunks. So once you're in,
-// navigating and scrolling don't re-download or jank. Minimum time so the
-// animation reads; a hard cap so a stuck asset can never trap the user.
+// request: "cargar todo en el inicio"): the fonts, the logo, and — on desktop —
+// the heavy three.js chunks. So once you're in, navigating and scrolling don't
+// re-download or jank. Minimum time so the animation reads; a hard cap so a
+// stuck asset can never trap the user.
 const MIN_MS = 1600;
 const MAX_MS = 9000;
-const FRAME_COUNT = 60;
-
-function preloadFrames() {
-  const tasks = [];
-  for (let i = 1; i <= FRAME_COUNT; i++) {
-    const src = `/media/proceso-frames/f-${String(i).padStart(3, '0')}.webp`;
-    const im = new Image();
-    tasks.push(
-      new Promise((res) => {
-        im.onload = res;
-        im.onerror = res;
-      }),
-    );
-    im.src = src; // warms the HTTP cache; ProcesoShowcase re-reads from cache instantly
-  }
-  return Promise.allSettled(tasks);
-}
 
 function preloadEverything() {
-  const tasks = [preloadFrames()];
+  const tasks = [];
 
   // fonts
   if (document.fonts && document.fonts.ready) tasks.push(document.fonts.ready.catch(() => {}));

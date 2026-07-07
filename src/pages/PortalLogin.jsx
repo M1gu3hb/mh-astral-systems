@@ -11,7 +11,7 @@ export default function PortalLogin() {
       title="Portal de cliente"
       subtitle="Consulta tus proyectos, avances y archivos."
       redirectTo="/portal/dashboard"
-      demoUser="confetti"
+      demoUser="demo"
     />
   );
 }

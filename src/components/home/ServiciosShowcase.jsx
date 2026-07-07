@@ -11,8 +11,10 @@ import Reveal from '../ui/Reveal';
 import ScreenMock from './ScreenMock';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
-// Video slot — drop the Google Flow clip here as /public/media/servicios-loop.mp4
-const SERVICIOS_VIDEO = '/media/servicios-loop.mp4';
+// No background video for Servicios (the coded laptop is the visual). Set a
+// path here later only if a Flow clip is added; null keeps the brand fallback
+// and avoids a 404 request.
+const SERVICIOS_VIDEO = null;
 
 // Slow, readable pacing: each service holds its full "screen" for its whole
 // scroll band (index-stepped, not a narrow fade window), so you can actually

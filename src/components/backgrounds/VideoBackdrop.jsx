@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 // scroll animation; a rich brand fallback covers it so the section looks
 // finished even before the video exists (or on reduced motion). The video is
 // only decorative and never blocks interaction.
-export default function VideoBackdrop({ src, tint = 'rgba(7,11,22,0.62)', className = '' }) {
+export default function VideoBackdrop({ src, tint = 'rgba(7,11,22,0.62)', videoOpacity = 0.55, className = '' }) {
   const reduced = usePrefersReducedMotion();
   const ref = useRef(null);
   const [ready, setReady] = useState(false);
@@ -37,9 +37,8 @@ export default function VideoBackdrop({ src, tint = 'rgba(7,11,22,0.62)', classN
       {src && !reduced && (
         <video
           ref={ref}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-            ready ? 'opacity-55' : 'opacity-0'
-          }`}
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
+          style={{ opacity: ready ? videoOpacity : 0 }}
           autoPlay
           muted
           loop

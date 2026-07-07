@@ -69,7 +69,7 @@ function Showcase() {
   return (
     <section id="proceso" ref={sectionRef} className="relative h-[260vh] scroll-mt-28">
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden">
-        <VideoBackdrop src={PROCESO_VIDEO} tint="rgba(7,11,22,0.68)" />
+        <VideoBackdrop src={PROCESO_VIDEO} videoOpacity={0.82} tint="rgba(7,11,22,0.5)" />
 
         <div className="container-mh relative z-10">
           <motion.div style={{ opacity: headOpacity }} className="mb-10 flex flex-col items-center gap-3 text-center">

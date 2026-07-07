@@ -2,29 +2,72 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import PixelSquares from '../ui/PixelSquares';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { isMobileNow } from '../../hooks/useIsMobile';
 
-// Entry splash: the real MH logo with a spinning tech ring while the page
-// finishes loading. It stays up until the window `load` event (so fonts,
-// chunks and the hero are ready) with a minimum of ~1.6s for the animation to
-// read and a hard cap so a slow third-party can never trap the user.
+// Entry splash. It genuinely PRELOADS the site before revealing it (client
+// request: "cargar todo en el inicio"): every Proceso scroll-scrub frame, the
+// fonts, and — on desktop — the heavy three.js chunks. So once you're in,
+// navigating and scrolling don't re-download or jank. Minimum time so the
+// animation reads; a hard cap so a stuck asset can never trap the user.
 const MIN_MS = 1600;
-const MAX_MS = 4500;
+const MAX_MS = 9000;
+const FRAME_COUNT = 60;
+
+function preloadFrames() {
+  const tasks = [];
+  for (let i = 1; i <= FRAME_COUNT; i++) {
+    const src = `/media/proceso-frames/f-${String(i).padStart(3, '0')}.webp`;
+    const im = new Image();
+    tasks.push(
+      new Promise((res) => {
+        im.onload = res;
+        im.onerror = res;
+      }),
+    );
+    im.src = src; // warms the HTTP cache; ProcesoShowcase re-reads from cache instantly
+  }
+  return Promise.allSettled(tasks);
+}
+
+function preloadEverything() {
+  const tasks = [preloadFrames()];
+
+  // fonts
+  if (document.fonts && document.fonts.ready) tasks.push(document.fonts.ready.catch(() => {}));
+
+  // logo
+  const logo = new Image();
+  tasks.push(new Promise((r) => { logo.onload = r; logo.onerror = r; }));
+  logo.src = '/logo.png';
+
+  // heavy WebGL chunks — only where they actually render (desktop)
+  if (!isMobileNow()) {
+    tasks.push(import('../reactbits/Beams').catch(() => {}));
+    tasks.push(import('../reactbits/ASCIIText').catch(() => {}));
+  }
+
+  return Promise.allSettled(tasks);
+}
 
 function useAppReady() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      setReady(true);
+    };
+
     const min = new Promise((r) => setTimeout(r, MIN_MS));
     const loaded =
       document.readyState === 'complete'
         ? Promise.resolve()
         : new Promise((r) => window.addEventListener('load', r, { once: true }));
-    const cap = new Promise((r) => setTimeout(r, MAX_MS));
-    Promise.race([Promise.all([min, loaded]), cap]).then(() => setReady(true));
 
-    // Warm the heavy lazy chunks while the splash is on screen so the hero
-    // background is ready the moment we reveal the page.
-    import('../reactbits/Beams').catch(() => {});
-    import('../reactbits/ASCIIText').catch(() => {});
+    Promise.all([min, loaded, preloadEverything()]).then(finish);
+    const cap = setTimeout(finish, MAX_MS);
+    return () => clearTimeout(cap);
   }, []);
   return ready;
 }
@@ -32,6 +75,14 @@ function useAppReady() {
 export default function SplashScreen({ children }) {
   const ready = useAppReady();
   const reduced = usePrefersReducedMotion();
+
+  // lock scroll while the splash is up
+  useEffect(() => {
+    document.documentElement.style.overflow = ready ? '' : 'hidden';
+    return () => {
+      document.documentElement.style.overflow = '';
+    };
+  }, [ready]);
 
   return (
     <>
@@ -46,19 +97,14 @@ export default function SplashScreen({ children }) {
             aria-label="Cargando MH Astral Systems"
             role="status"
           >
-            {/* faint circuit texture */}
             <div className="absolute inset-0 bg-circuit opacity-30" aria-hidden="true" />
             <div
               className="absolute inset-0"
               aria-hidden="true"
-              style={{
-                background:
-                  'radial-gradient(45% 45% at 50% 42%, rgba(30,91,255,0.16), transparent 70%)',
-              }}
+              style={{ background: 'radial-gradient(45% 45% at 50% 42%, rgba(30,91,255,0.16), transparent 70%)' }}
             />
 
             <div className="relative grid place-items-center">
-              {/* spinning loader ring */}
               {!reduced && (
                 <>
                   <span
@@ -67,8 +113,7 @@ export default function SplashScreen({ children }) {
                       background:
                         'conic-gradient(from 0deg, transparent 0deg, transparent 250deg, rgba(30,91,255,0.9) 320deg, rgba(191,214,255,0.9) 355deg, transparent 360deg)',
                       mask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))',
-                      WebkitMask:
-                        'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))',
+                      WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px))',
                       animationDuration: '1.6s',
                     }}
                     aria-hidden="true"
@@ -79,15 +124,13 @@ export default function SplashScreen({ children }) {
                       background:
                         'conic-gradient(from 180deg, transparent 0deg, rgba(91,140,255,0.5) 40deg, transparent 90deg)',
                       mask: 'radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 0.5px))',
-                      WebkitMask:
-                        'radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 0.5px))',
+                      WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 0.5px))',
                       animationDuration: '5s',
                     }}
                     aria-hidden="true"
                   />
                 </>
               )}
-              {/* breathing glow + the real logo */}
               <span className="absolute h-40 w-40 rounded-full bg-electric-600/25 blur-2xl animate-glow-breathe" aria-hidden="true" />
               <motion.img
                 src="/logo.png"
@@ -107,7 +150,6 @@ export default function SplashScreen({ children }) {
                 <PixelSquares />
                 MH Astral Systems
               </span>
-              {/* loading shimmer bar */}
               <span className="skeleton block h-1 w-36 rounded-full" aria-hidden="true" />
             </div>
           </motion.div>

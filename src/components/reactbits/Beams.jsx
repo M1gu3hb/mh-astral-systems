@@ -50,8 +50,11 @@ function extendMaterial(BaseMaterial, cfg) {
   return mat;
 }
 
+// MH adaptation (docs/10): transparent canvas (alpha) + no opaque background so
+// the brand blue glow layer behind shows through the dark gaps between beams —
+// kills the "black hole" the opaque #000/#070B16 background left in the corners.
 const CanvasWrapper = ({ children }) => (
-  <Canvas dpr={[1, 2]} frameloop="always" className="beams-container">
+  <Canvas dpr={[1, 1.5]} frameloop="always" gl={{ alpha: true, antialias: true }} className="beams-container">
     {children}
   </Canvas>
 );
@@ -216,8 +219,8 @@ const Beams = ({
         <DirLight color={lightColor} position={[0, 3, 10]} />
       </group>
       <ambientLight intensity={1} />
-      {/* Recolored to the MH brand void (docs/02) — was pure #000000 */}
-      <color attach="background" args={['#070B16']} />
+      {/* No opaque background — the canvas is transparent so the blue base
+          layer behind shows through (docs/10 adaptation). */}
       <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={30} />
     </CanvasWrapper>
   );

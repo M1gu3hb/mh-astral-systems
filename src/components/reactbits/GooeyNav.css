@@ -102,6 +102,11 @@
   transform: scale(1);
 }
 
+/* MH adaptation (docs/10): the original gooey "metaball" relied on a huge black
+   backdrop + blur/contrast + lighten blend. Inside the translucent glass header
+   that backdrop rendered as an ugly opaque BLACK BOX. We drop the metaball trick
+   entirely — the sliding pill (li.active::after) and the colored particle burst
+   are what carry the effect, and neither needs the black box. */
 .gooey-nav-container .effect {
   position: absolute;
   left: 0;
@@ -115,60 +120,35 @@
   z-index: 1;
 }
 
+/* the duplicate white "text" layer and the white pill are no longer needed —
+   li.active handles color + pill. Keep the filter node ONLY as the particle host. */
 .gooey-nav-container .effect.text {
-  color: #b7c0d6;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.gooey-nav-container .effect.text.active {
-  color: #ffffff;
+  display: none;
 }
 
 .gooey-nav-container .effect.filter {
-  filter: blur(7px) contrast(100) blur(0);
-  mix-blend-mode: lighten;
+  filter: none;
+  mix-blend-mode: normal;
+  overflow: visible;
 }
 
-.gooey-nav-container .effect.filter::before {
-  content: '';
-  position: absolute;
-  inset: -75px;
-  z-index: -2;
-  background: black;
-}
-
+.gooey-nav-container .effect.filter::before,
 .gooey-nav-container .effect.filter::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #1e5bff;
-  transform: scale(0);
-  opacity: 0;
-  z-index: -1;
-  border-radius: 100vw;
-}
-
-.gooey-nav-container .effect.active::after {
-  animation: pill 0.3s ease both;
-}
-
-@keyframes pill {
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  display: none;
 }
 
 .particle,
 .point {
   display: block;
   opacity: 0;
-  width: 20px;
-  height: 20px;
+  width: 9px;
+  height: 9px;
   border-radius: 100%;
   transform-origin: center;
+}
+
+.point {
+  box-shadow: 0 0 8px 1px var(--color, #1e5bff);
 }
 
 .particle {

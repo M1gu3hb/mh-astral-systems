@@ -1,19 +1,32 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
-// Big animated brand sign-off (react-bits ASCIIText, recolored to brand blues)
-// shown above the footer on every public page. three.js-heavy, so it only
-// mounts when the visitor actually scrolls near it; a skeleton block holds the
-// space until then.
+// Big animated brand sign-off. On desktop it's the react-bits ASCIIText (WebGL,
+// recolored blue). On mobile it was heavy AND rendered cut off — so phones get
+// the full brand wordmark as a clean chrome-gradient headline (complete,
+// centered, light). Desktop mounts the WebGL only when scrolled near it.
 const ASCIIText = lazy(() => import('../reactbits/ASCIIText'));
+
+function StaticWordmark() {
+  return (
+    <div className="grid h-full place-items-center px-5">
+      <p className="text-center font-display text-[13vw] font-bold leading-none text-gradient-chrome sm:text-6xl md:text-7xl">
+        MH Astral Systems
+      </p>
+    </div>
+  );
+}
 
 export default function AsciiOutro() {
   const holderRef = useRef(null);
   const [near, setNear] = useState(false);
   const reduced = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
+  const useAscii = !reduced && !isMobile;
 
   useEffect(() => {
-    if (reduced) return;
+    if (!useAscii) return;
     const el = holderRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
@@ -22,20 +35,16 @@ export default function AsciiOutro() {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [reduced]);
+  }, [useAscii]);
 
   return (
     <section
       ref={holderRef}
       aria-label="MH Astral Systems"
-      className="relative mt-section h-[34vh] min-h-[220px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
+      className="relative mt-section h-[30vh] min-h-[180px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
     >
-      {reduced ? (
-        <div className="grid h-full place-items-center px-4">
-          <p className="text-center font-display text-4xl font-bold text-gradient-chrome sm:text-6xl">
-            MH Astral Systems
-          </p>
-        </div>
+      {!useAscii ? (
+        <StaticWordmark />
       ) : near ? (
         <Suspense fallback={<div className="skeleton absolute inset-6 rounded-2xl" aria-hidden="true" />}>
           <ASCIIText

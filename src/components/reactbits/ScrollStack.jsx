@@ -1,6 +1,10 @@
 import { useLayoutEffect, useRef, useCallback } from 'react';
-import Lenis from 'lenis';
 import './ScrollStack.css';
+
+// Adaptation (docs/10): the original drove the stack with Lenis smooth-scroll,
+// which hijacked the whole page scroll and made mobile feel broken + slow and
+// fought the other sticky scroll section. Swapped for a native, rAF-throttled
+// scroll listener — same stacking math, but the browser owns scrolling.
 
 export const ScrollStackItem = ({ children, itemClassName = '' }) => (
   <div className={`scroll-stack-card ${itemClassName}`.trim()}>{children}</div>
@@ -24,7 +28,8 @@ const ScrollStack = ({
   const scrollerRef = useRef(null);
   const stackCompletedRef = useRef(false);
   const animationFrameRef = useRef(null);
-  const lenisRef = useRef(null);
+  const tickingRef = useRef(false);
+  const cleanupScrollRef = useRef(null);
   const cardsRef = useRef([]);
   const lastTransformsRef = useRef(new Map());
   const isUpdatingRef = useRef(false);
@@ -180,66 +185,24 @@ const ScrollStack = ({
   ]);
 
   const handleScroll = useCallback(() => {
-    updateCardTransforms();
+    if (tickingRef.current) return;
+    tickingRef.current = true;
+    animationFrameRef.current = requestAnimationFrame(() => {
+      tickingRef.current = false;
+      updateCardTransforms();
+    });
   }, [updateCardTransforms]);
 
-  const setupLenis = useCallback(() => {
-    if (useWindowScroll) {
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2,
-        infinite: false,
-        wheelMultiplier: 1,
-        lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075
-      });
-
-      lenis.on('scroll', handleScroll);
-
-      const raf = time => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
-      };
-      animationFrameRef.current = requestAnimationFrame(raf);
-
-      lenisRef.current = lenis;
-      return lenis;
-    } else {
-      const scroller = scrollerRef.current;
-      if (!scroller) return;
-
-      const lenis = new Lenis({
-        wrapper: scroller,
-        content: scroller.querySelector('.scroll-stack-inner'),
-        duration: 1.2,
-        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2,
-        infinite: false,
-        gestureOrientationHandler: true,
-        normalizeWheel: true,
-        wheelMultiplier: 1,
-        touchInertiaMultiplier: 35,
-        lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075,
-        touchInertia: 0.6
-      });
-
-      lenis.on('scroll', handleScroll);
-
-      const raf = time => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
-      };
-      animationFrameRef.current = requestAnimationFrame(raf);
-
-      lenisRef.current = lenis;
-      return lenis;
-    }
+  // Native scroll (no Lenis) — the browser keeps its normal, fast, correct feel.
+  const setupScroll = useCallback(() => {
+    const target = useWindowScroll ? window : scrollerRef.current;
+    if (!target) return;
+    target.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    cleanupScrollRef.current = () => {
+      target.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, [handleScroll, useWindowScroll]);
 
   useLayoutEffect(() => {
@@ -268,7 +231,7 @@ const ScrollStack = ({
       card.style.webkitPerspective = '1000px';
     });
 
-    setupLenis();
+    setupScroll();
 
     updateCardTransforms();
 
@@ -276,8 +239,9 @@ const ScrollStack = ({
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      if (lenisRef.current) {
-        lenisRef.current.destroy();
+      if (cleanupScrollRef.current) {
+        cleanupScrollRef.current();
+        cleanupScrollRef.current = null;
       }
       stackCompletedRef.current = false;
       cardsRef.current = [];
@@ -296,7 +260,7 @@ const ScrollStack = ({
     blurAmount,
     useWindowScroll,
     onStackComplete,
-    setupLenis,
+    setupScroll,
     updateCardTransforms
   ]);
 

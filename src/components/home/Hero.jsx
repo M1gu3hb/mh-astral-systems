@@ -5,36 +5,23 @@ import RotatingText from '../reactbits/RotatingText';
 import { HERO } from '../../data/site';
 import { whatsappLink, WA_MESSAGES } from '../../lib/whatsapp';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
-// Beams (react-bits) — the new hero background (replaces the old shader),
-// recolored to the brand: void backdrop + electric-blue directional light.
-// Heavy (three.js) → lazy chunk with a skeleton-shimmer fallback.
+// Beams (react-bits) — desktop hero background. Heavy three.js, so: lazy chunk,
+// desktop-only (mobile gets a light animated gradient instead), transparent
+// canvas over a blue base so there's never a dead-black gap.
 const Beams = lazy(() => import('../reactbits/Beams'));
 
-const ROTATING_SERVICES = [
-  'páginas web',
-  'paneles propios',
-  'POS y CRM',
-  'automatizaciones',
-  'menús QR',
-  'dashboards',
-];
+// Curated, similar-length service words. Fixed-width pill (below) means none of
+// these resize the layout when they rotate — no more page "stretch".
+const ROTATING_SERVICES = ['páginas web', 'panel propio', 'POS y CRM', 'menús QR', 'dashboards'];
 
-function StaticBg() {
-  return (
-    <div
-      aria-hidden="true"
-      className="skeleton absolute inset-0"
-      style={{
-        background:
-          'radial-gradient(70% 90% at 78% 8%, rgba(30,91,255,0.28), transparent 55%),' +
-          'linear-gradient(180deg, #070B16, #0B1120)',
-      }}
-    />
-  );
-}
+// rich brand base — always present so beams' dark gaps read blue, never black
+const BRAND_BASE =
+  'radial-gradient(55% 60% at 76% 18%, rgba(30,91,255,0.34), transparent 62%),' +
+  'radial-gradient(50% 65% at 8% 92%, rgba(10,31,85,0.6), transparent 60%),' +
+  'linear-gradient(135deg, #0a1533 0%, #070B16 52%, #0b1c40 100%)';
 
-// The real MH logo as a glowing centerpiece (kept from the previous design).
 function LogoHero({ reduced }) {
   return (
     <div className="relative mx-auto grid aspect-square w-full max-w-[13rem] place-items-center sm:max-w-[17rem] lg:max-w-[26rem]">
@@ -89,6 +76,7 @@ function LogoHero({ reduced }) {
 
 export default function Hero() {
   const reduced = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
 
   const container = {
     hidden: {},
@@ -106,28 +94,37 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-16">
-      {/* Beams background — brand-blue light over the void */}
+      {/* background */}
       <div className="absolute inset-0 -z-10">
-        {reduced ? (
-          <StaticBg />
-        ) : (
-          <Suspense fallback={<StaticBg />}>
+        {/* rich brand base — always: no dead-black gaps */}
+        <div className="absolute inset-0" style={{ background: BRAND_BASE }} />
+
+        {/* desktop: Beams. mobile: light floating aurora blobs (smooth, cheap) */}
+        {!reduced && !isMobile && (
+          <Suspense fallback={null}>
             <div className="absolute inset-0">
               <Beams
-                beamWidth={2.2}
-                beamHeight={18}
-                beamNumber={13}
-                lightColor="#2E66FF"
-                speed={1.7}
-                noiseIntensity={1.6}
-                scale={0.22}
-                rotation={28}
+                beamWidth={2.4}
+                beamHeight={20}
+                beamNumber={12}
+                lightColor="#3B72FF"
+                speed={1.6}
+                noiseIntensity={1.5}
+                scale={0.2}
+                rotation={26}
               />
             </div>
           </Suspense>
         )}
-        <div className="absolute inset-0 bg-circuit opacity-[0.3]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/45 via-void/35 to-void" />
+        {!reduced && isMobile && (
+          <>
+            <span className="absolute -right-16 top-6 h-72 w-72 rounded-full bg-electric-600/25 blur-3xl animate-float-slow" />
+            <span className="absolute -left-10 bottom-4 h-64 w-64 rounded-full bg-electric-900/50 blur-3xl [animation:float-slow_9s_ease-in-out_infinite]" />
+          </>
+        )}
+
+        <div className="absolute inset-0 bg-circuit opacity-[0.28]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/35 via-void/25 to-void" />
       </div>
 
       <div className="container-mh flex flex-col items-center gap-7 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-6">
@@ -141,25 +138,27 @@ export default function Hero() {
             {HERO.eyebrow}
           </motion.span>
 
-          {/* headline with the rotating service chip */}
+          {/* headline with the rotating service chip (fixed-width pill = no reflow) */}
           <h1 className="flex flex-col gap-2">
             <motion.span variants={item} className="text-hero font-medium text-silver-dim">
               Digitaliza tu negocio con
             </motion.span>
-            <motion.span variants={item} className="flex">
-              <RotatingText
-                texts={ROTATING_SERVICES}
-                auto={!reduced}
-                mainClassName="text-hero-accent inline-flex w-fit items-center overflow-hidden rounded-2xl bg-gradient-to-b from-[#3d74ff] via-electric-600 to-[#1848d6] px-4 py-1 font-display font-bold text-white shadow-glow sm:px-6"
-                splitLevelClassName="overflow-hidden"
-                staggerFrom="last"
-                staggerDuration={0.02}
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '-120%' }}
-                transition={{ type: 'spring', damping: 30, stiffness: 400 }}
-                rotationInterval={2600}
-              />
+            <motion.span variants={item} className="text-[clamp(2rem,1rem+4.4vw,3.8rem)]">
+              <span className="flex h-[1.32em] w-[min(88vw,26rem)] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-[#3d74ff] via-electric-600 to-[#1848d6] px-3 leading-none shadow-glow">
+                <RotatingText
+                  texts={ROTATING_SERVICES}
+                  auto={!reduced}
+                  mainClassName="flex justify-center whitespace-nowrap font-display font-bold leading-none text-white"
+                  splitLevelClassName="overflow-hidden py-[0.12em]"
+                  staggerFrom="last"
+                  staggerDuration={0.018}
+                  initial={{ y: '110%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '-120%' }}
+                  transition={{ type: 'spring', damping: 32, stiffness: 380 }}
+                  rotationInterval={2600}
+                />
+              </span>
             </motion.span>
             <motion.span variants={item} className="text-hero font-semibold text-white">
               que sí venden y organizan.

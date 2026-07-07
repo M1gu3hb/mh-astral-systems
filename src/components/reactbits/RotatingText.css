@@ -1,7 +1,9 @@
 .text-rotate {
   display: flex;
-  flex-wrap: wrap;
-  white-space: pre-wrap;
+  /* MH adaptation (docs/10): the hero uses a single, fixed-width pill — force
+     one line so a rotating word never wraps and reflows the layout. */
+  flex-wrap: nowrap;
+  white-space: nowrap;
   position: relative;
 }
 

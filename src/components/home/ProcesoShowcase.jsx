@@ -177,7 +177,7 @@ function Showcase() {
   });
 
   return (
-    <section id="proceso" ref={sectionRef} className="relative h-[300vh] scroll-mt-28">
+    <section id="proceso" ref={sectionRef} className="relative h-[230vh] scroll-mt-28 md:h-[300vh]">
       <div className="sticky top-0 flex h-[100svh] flex-col justify-center overflow-hidden">
         {/* brand base (shows before frames load) */}
         <div

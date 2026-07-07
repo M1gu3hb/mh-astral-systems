@@ -96,3 +96,28 @@
   background-size: cover;
   background-position: 50% 50%;
 }
+
+/* MH adaptation (docs/10): phone fit. The desktop rows use big nowrap 4vh type,
+   which overflows / gets cut on narrow screens — on phones the titles wrap,
+   shrink and center instead, and the marquee strip scales down to match. */
+@media (max-width: 768px) {
+  .menu__item-link {
+    white-space: normal;
+    text-align: center;
+    text-wrap: balance;
+    font-size: clamp(1rem, 4.6vw, 1.35rem);
+    line-height: 1.3;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .marquee span {
+    font-size: clamp(0.95rem, 4.2vw, 1.25rem);
+    padding: 0 3vw;
+  }
+
+  .marquee__img {
+    width: 110px;
+    height: 4.5vh;
+    margin: 1em 3vw;
+  }
+}

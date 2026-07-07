@@ -53,10 +53,8 @@ export default function AsciiOutro() {
     if (reduced) return;
     const el = holderRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setNear(true)),
-      { rootMargin: '500px 0px' },
-    );
+    // two-way: only run the animated wordmark while it's near the viewport
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { rootMargin: '300px 0px' });
     io.observe(el);
     return () => io.disconnect();
   }, [reduced]);

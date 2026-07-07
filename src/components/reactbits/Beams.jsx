@@ -53,8 +53,8 @@ function extendMaterial(BaseMaterial, cfg) {
 // MH adaptation (docs/10): transparent canvas (alpha) + no opaque background so
 // the brand blue glow layer behind shows through the dark gaps between beams —
 // kills the "black hole" the opaque #000/#070B16 background left in the corners.
-const CanvasWrapper = ({ children }) => (
-  <Canvas dpr={[1, 1.5]} frameloop="always" gl={{ alpha: true, antialias: true }} className="beams-container">
+const CanvasWrapper = ({ children, dpr = [1, 1.5], frameloop = 'always' }) => (
+  <Canvas dpr={dpr} frameloop={frameloop} gl={{ alpha: true, antialias: true }} className="beams-container">
     {children}
   </Canvas>
 );
@@ -152,7 +152,9 @@ const Beams = ({
   speed = 2,
   noiseIntensity = 1.75,
   scale = 0.2,
-  rotation = 0
+  rotation = 0,
+  dpr = [1, 1.5],
+  frameloop = 'always'
 }) => {
   const meshRef = useRef(null);
   const beamMaterial = useMemo(
@@ -213,7 +215,7 @@ const Beams = ({
   );
 
   return (
-    <CanvasWrapper>
+    <CanvasWrapper dpr={dpr} frameloop={frameloop}>
       <group rotation={[0, 0, degToRad(rotation)]}>
         <PlaneNoise ref={meshRef} material={beamMaterial} count={beamNumber} width={beamWidth} height={beamHeight} />
         <DirLight color={lightColor} position={[0, 3, 10]} />

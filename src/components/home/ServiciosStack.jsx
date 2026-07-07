@@ -41,9 +41,22 @@ function SvcCard({ s, i }) {
         )}
       </div>
 
-      {/* app preview */}
+      {/* app preview — real render if we have one, else the coded mock */}
       <div className="relative mt-3 min-h-0 flex-1 overflow-hidden rounded-xl border border-white/10 bg-void">
-        <ScreenMock i={i} />
+        {s.img ? (
+          <img
+            src={s.img}
+            alt={s.label}
+            loading="lazy"
+            decoding="async"
+            width={940}
+            height={588}
+            draggable={false}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <ScreenMock i={i} />
+        )}
       </div>
 
       <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-silver-dim">{s.ayuda}</p>

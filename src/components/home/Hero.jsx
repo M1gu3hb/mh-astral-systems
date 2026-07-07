@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight, ArrowDown } from 'lucide-react';
 import RotatingText from '../reactbits/RotatingText';
@@ -41,35 +41,52 @@ function rotatingPill(sizeClass, reduced) {
   );
 }
 
-// Little stars / meteors orbiting the logo — the "astral" nod. Each orbit is a
-// rotating ring (different radius/speed/direction) carrying one glowing speck.
-function Star({ cls }) {
-  return <span className={`block rounded-full shadow-[0_0_8px_2px_rgba(91,140,255,0.55)] ${cls}`} />;
-}
-function Meteor({ from = 'from-chrome-highlight' }) {
-  return (
-    <span className="flex items-center">
-      <span className={`block h-[2px] w-7 rounded-full bg-gradient-to-l ${from} via-electric-400/70 to-transparent`} />
-      <span className="-ml-0.5 block h-1.5 w-1.5 rounded-full bg-chrome-highlight shadow-[0_0_8px_2px_rgba(191,214,255,0.7)]" />
-    </span>
-  );
+// Stars / meteors orbiting the logo — the "astral" nod. Each object rides its own
+// rotating ring; it sits at the TOP of the ring with its tail pointing DOWN, i.e.
+// straight at the centre. Since object + tail rotate together, every meteor keeps
+// pointing at the centre all the way around. Start angle is offset via a negative
+// animation-delay so they end up dispersed, not clustered at 12 o'clock.
+function OrbitObj({ kind, dot, tail }) {
+  if (kind === 'meteor') {
+    return (
+      <span className="flex flex-col items-center">
+        <span className={`block rounded-full shadow-[0_0_8px_2px_rgba(191,214,255,0.6)] ${dot}`} />
+        <span
+          className="mt-[3px] block w-[2px] rounded-full bg-gradient-to-b from-chrome-highlight/85 to-transparent"
+          style={{ height: tail }}
+        />
+      </span>
+    );
+  }
+  return <span className={`block rounded-full shadow-[0_0_8px_2px_rgba(91,140,255,0.5)] ${dot}`} />;
 }
 
 const ORBITS = [
-  { inset: '-7%', anim: 'spin-slow 30s linear infinite', pos: 'left-1/2 top-0 -translate-x-1/2', el: <Star cls="h-1.5 w-1.5 bg-chrome-highlight" /> },
-  { inset: '4%', anim: 'spin-slow 42s linear infinite reverse', pos: 'right-0 top-1/2 -translate-y-1/2', el: <Meteor /> },
-  { inset: '-3%', anim: 'spin-slow 24s linear infinite', pos: 'left-1/2 bottom-0 -translate-x-1/2', el: <Star cls="h-1 w-1 bg-white" /> },
-  { inset: '11%', anim: 'spin-slow 34s linear infinite reverse', pos: 'left-0 top-1/3', el: <Star cls="h-1.5 w-1.5 bg-electric-400" /> },
-  { inset: '-9%', anim: 'spin-slow 48s linear infinite', pos: 'right-[10%] top-[6%]', el: <Meteor from="from-electric-400" /> },
-  { inset: '9%', anim: 'spin-slow 28s linear infinite', pos: 'right-[8%] bottom-[14%]', el: <Star cls="h-1 w-1 bg-electric-600" /> },
+  { inset: '-9%', dur: 32, rev: false, delay: '0s', kind: 'meteor', dot: 'h-1.5 w-1.5 bg-chrome-highlight', tail: '20px' },
+  { inset: '-3%', dur: 26, rev: true, delay: '-5s', kind: 'dot', dot: 'h-1 w-1 bg-white' },
+  { inset: '5%', dur: 30, rev: false, delay: '-12s', kind: 'meteor', dot: 'h-1.5 w-1.5 bg-electric-400', tail: '16px' },
+  { inset: '-6%', dur: 44, rev: true, delay: '-3s', kind: 'dot', dot: 'h-1.5 w-1.5 bg-electric-400' },
+  { inset: '11%', dur: 22, rev: false, delay: '-9s', kind: 'dot', dot: 'h-1 w-1 bg-electric-600' },
+  { inset: '-11%', dur: 52, rev: false, delay: '-20s', kind: 'meteor', dot: 'h-1 w-1 bg-chrome-highlight', tail: '14px' },
+  { inset: '1%', dur: 38, rev: true, delay: '-16s', kind: 'dot', dot: 'h-1 w-1 bg-chrome-highlight' },
+  { inset: '-4%', dur: 28, rev: false, delay: '-24s', kind: 'dot', dot: 'h-1.5 w-1.5 bg-white' },
+  { inset: '8%', dur: 34, rev: true, delay: '-7s', kind: 'meteor', dot: 'h-1 w-1 bg-electric-400', tail: '15px' },
+  { inset: '-1%', dur: 40, rev: false, delay: '-30s', kind: 'dot', dot: 'h-1 w-1 bg-electric-400' },
 ];
 
 function OrbitStars({ reduced }) {
+  if (reduced) return null;
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden="true">
       {ORBITS.map((o, i) => (
-        <div key={i} className="absolute rounded-full" style={{ inset: o.inset, animation: reduced ? 'none' : o.anim }}>
-          <span className={`absolute ${o.pos}`}>{o.el}</span>
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{ inset: o.inset, animation: `spin-slow ${o.dur}s linear ${o.delay} infinite${o.rev ? ' reverse' : ''}` }}
+        >
+          <span className="absolute left-1/2 top-0 -translate-x-1/2">
+            <OrbitObj kind={o.kind} dot={o.dot} tail={o.tail} />
+          </span>
         </div>
       ))}
     </div>
@@ -284,9 +301,22 @@ function DesktopHero({ reduced }) {
 export default function Hero() {
   const reduced = usePrefersReducedMotion();
   const isMobile = useIsMobile();
+  const sectionRef = useRef(null);
+  // Pause the WebGL Beams when the hero scrolls off-screen — otherwise it keeps
+  // burning the GPU behind the rest of the page and tanks FPS on mobile.
+  const [heroOnScreen, setHeroOnScreen] = useState(true);
+
+  useEffect(() => {
+    if (reduced) return;
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setHeroOnScreen(e.isIntersecting), { rootMargin: '120px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduced]);
 
   return (
-    <section className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-20">
+    <section ref={sectionRef} className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-20">
       {/* background — Beams (new bg) on desktop + mobile; static only for reduced motion */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0" style={{ background: BRAND_BASE }} />
@@ -296,12 +326,14 @@ export default function Hero() {
               <Beams
                 beamWidth={2.4}
                 beamHeight={20}
-                beamNumber={isMobile ? 9 : 12}
+                beamNumber={isMobile ? 8 : 12}
                 lightColor="#3B72FF"
                 speed={isMobile ? 1.3 : 1.6}
                 noiseIntensity={1.5}
                 scale={0.2}
                 rotation={26}
+                dpr={isMobile ? [1, 1] : [1, 1.5]}
+                frameloop={heroOnScreen ? 'always' : 'never'}
               />
             </div>
           </Suspense>

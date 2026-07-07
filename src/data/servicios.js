@@ -19,6 +19,7 @@ export const SERVICIOS = [
     desc: 'El cliente edita fotos, precios, promociones y descripciones desde su propio panel, sin depender de mí para cada cambio.',
     ayuda:
       'Dejas de esperar a un desarrollador: cambias precios, fotos y promos al momento y tu página siempre está al día.',
+    img: '/media/servicios/panel-autoedicion.webp',
     highlight: true,
   },
   {
@@ -26,41 +27,48 @@ export const SERVICIOS = [
     label: 'Páginas web profesionales',
     desc: 'Presencia que carga rápido, se ve bien y convierte visitas en clientes.',
     ayuda: 'Tu negocio se presenta bien 24/7: más confianza para quien te busca y más mensajes directos a tu WhatsApp.',
+    img: '/media/servicios/pagina-web.webp',
   },
   {
     icon: Store,
     label: 'POS para restaurantes y negocios',
     desc: 'Cobros, abonos y cortes de caja en un flujo simple de operar.',
     ayuda: 'Cobras más rápido, controlas abonos y cierras caja en minutos — sin cuadernos ni hojas sueltas.',
+    img: '/media/servicios/pos.webp',
   },
   {
     icon: Users,
     label: 'CRM y seguimiento de clientes',
     desc: 'Prospectos ordenados, nada se queda sin respuesta.',
     ayuda: 'Cada prospecto queda registrado y con seguimiento: no se te vuelve a escapar una venta por olvido.',
+    img: '/media/servicios/crm.webp',
   },
   {
     icon: Workflow,
     label: 'Automatizaciones para negocios',
     desc: 'Tareas repetitivas que se disparan solas: avisos, contratos, seguimientos.',
     ayuda: 'Cotizaciones, contratos y avisos se generan solos: recuperas horas a la semana para atender clientes.',
+    img: '/media/servicios/automatizaciones.webp',
   },
   {
     icon: QrCode,
     label: 'Menús QR interactivos',
     desc: 'Catálogo público que tu cliente escanea, explora y pide.',
     ayuda: 'Tu cliente escanea y pide sin apps ni fricción; tú actualizas el menú sin reimprimir nada.',
+    img: '/media/servicios/menus-qr.webp',
   },
   {
     icon: Calculator,
     label: 'Cotizadores, formularios y dashboards',
     desc: 'Arma propuestas al instante y mide resultados de un vistazo.',
     ayuda: 'Respondes con propuestas en minutos y ves las cifras clave de tu negocio en una sola pantalla.',
+    img: '/media/servicios/dashboards.webp',
   },
   {
     icon: PenTool,
     label: 'UI / UX / Systems',
     desc: 'Diseño e ingeniería del sistema completo, no solo la fachada.',
     ayuda: 'Interfaces claras que guían a tu cliente hasta el contacto o la compra — diseño pensado para vender.',
+    img: '/media/servicios/ui-ux.webp',
   },
 ];

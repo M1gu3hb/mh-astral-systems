@@ -1,22 +1,21 @@
-VIDEOS DE FONDO (animaciones de scroll)
-========================================
+VIDEOS DE FONDO / ANIMACIÓN
+============================
 
-Aquí van los 2 videos que generes con Google Flow. El sitio ya está cableado
-para usarlos automáticamente en cuanto existan estos archivos (con estos
-nombres EXACTOS):
+Aquí van los videos que generes con Google Flow (Veo 3.1 Fast).
+Los prompts EXACTOS y el plan están en la carpeta:  /prompts-flow/
 
-  servicios-loop.mp4   -> fondo de la sección "Servicios" (la laptop)
-  proceso-loop.mp4     -> fondo de la sección "Proceso" (los 4 pasos)
+Nombres EXACTOS que espera el sitio:
 
-Formato recomendado:
-  - MP4 (códec H.264)
-  - 1920x1080 (16:9)
-  - 8-10 segundos, en LOOP sin corte visible (que el final empate con el inicio)
-  - Sin audio (se reproduce en mudo)
-  - Peso ideal < 6 MB por video (comprímelo; es un fondo, no necesita 4K)
+  servicios.mp4       -> Video 1 (SERVICIOS). Es la animación de la laptop.
+                         Si generaste 2 clips de 8s, únelos en un solo mp4 de 16s
+                         y guárdalo así. (O mándame los 2 clips y yo los uno.)
+                         OJO: esta reemplaza la animación programada actual — avísame
+                         cuando lo tengas y yo hago el cambio en el código.
 
-El sitio los pone DETRÁS de la animación (a ~55% de opacidad, teñidos de azul
-de marca, con degradado oscuro arriba/abajo). Por eso el centro del video debe
-quedar más oscuro/tranquilo: encima va la laptop / las tarjetas.
+  proceso-loop.mp4    -> Video 2 (PROCESO). Fondo en loop detrás de las tarjetas
+                         de vidrio. Entra automáticamente, no borro nada.
 
-Los prompts EXACTOS para generarlos están en:  PROMPTS-VIDEO-FLOW.md  (raíz del proyecto)
+Formato:
+  - MP4 (H.264), 1920x1080, 16:9 horizontal
+  - Sin audio · < 8 MB por archivo (comprímelo, es fondo)
+  - Composición centrada (ver la regla de encuadre en /prompts-flow/README.md)

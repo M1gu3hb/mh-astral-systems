@@ -1,9 +1,20 @@
-import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef } from 'react';
+import React, {
+  Children,
+  cloneElement,
+  forwardRef,
+  isValidElement,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from 'react';
 import gsap from 'gsap';
 import './CardSwap.css';
 
-// React Bits — CardSwap (exact source). Adapted (docs/10) only via CSS recolor to
-// the brand palette; the animation logic below is unmodified.
+// React Bits — CardSwap. Adapted (docs/10): recolored to brand via CSS, and
+// extended with an imperative `goTo(index)` + `onIndexChange` so the deck can be
+// driven by the service legend buttons (click an icon/card → that card animates
+// to the front). Core swap animation is unchanged.
 export const Card = forwardRef(({ customClass, ...rest }, ref) => (
   <div ref={ref} {...rest} className={`card ${customClass ?? ''} ${rest.className ?? ''}`.trim()} />
 ));
@@ -28,18 +39,22 @@ const placeNow = (el, slot, skew) =>
     force3D: true,
   });
 
-const CardSwap = ({
-  width = 500,
-  height = 400,
-  cardDistance = 60,
-  verticalDistance = 70,
-  delay = 5000,
-  pauseOnHover = false,
-  onCardClick,
-  skewAmount = 6,
-  easing = 'elastic',
-  children,
-}) => {
+const CardSwap = forwardRef(function CardSwap(
+  {
+    width = 500,
+    height = 400,
+    cardDistance = 60,
+    verticalDistance = 70,
+    delay = 5000,
+    pauseOnHover = false,
+    onCardClick,
+    onIndexChange,
+    skewAmount = 6,
+    easing = 'elastic',
+    children,
+  },
+  apiRef,
+) {
   const config =
     easing === 'elastic'
       ? {
@@ -71,6 +86,35 @@ const CardSwap = ({
   const tlRef = useRef(null);
   const intervalRef = useRef();
   const container = useRef(null);
+  const swapRef = useRef(() => {});
+  const onIndexChangeRef = useRef(onIndexChange);
+  onIndexChangeRef.current = onIndexChange;
+
+  // Imperative jump: bring `index` to the front, keeping the rest in order.
+  useImperativeHandle(apiRef, () => ({
+    goTo(index) {
+      if (order.current[0] === index) return;
+      tlRef.current?.kill();
+      clearInterval(intervalRef.current);
+
+      const total = refs.length;
+      const rest = order.current.filter((i) => i !== index);
+      order.current = [index, ...rest];
+
+      const tl = gsap.timeline();
+      tlRef.current = tl;
+      order.current.forEach((cardIdx, slotPos) => {
+        const el = refs[cardIdx]?.current;
+        if (!el) return;
+        const slot = makeSlot(slotPos, cardDistance, verticalDistance, total);
+        gsap.set(el, { zIndex: slot.zIndex });
+        tl.to(el, { x: slot.x, y: slot.y, z: slot.z, duration: 0.65, ease: 'power3.out' }, 0);
+      });
+
+      onIndexChangeRef.current?.(index);
+      intervalRef.current = window.setInterval(() => swapRef.current(), delay);
+    },
+  }));
 
   useEffect(() => {
     const total = refs.length;
@@ -131,9 +175,11 @@ const CardSwap = ({
 
       tl.call(() => {
         order.current = [...rest, front];
+        onIndexChangeRef.current?.(order.current[0]);
       });
     };
 
+    swapRef.current = swap;
     swap();
     intervalRef.current = window.setInterval(swap, delay);
 
@@ -145,6 +191,7 @@ const CardSwap = ({
       };
       const resume = () => {
         tlRef.current?.play();
+        clearInterval(intervalRef.current);
         intervalRef.current = window.setInterval(swap, delay);
       };
       node.addEventListener('mouseenter', pause);
@@ -178,6 +225,6 @@ const CardSwap = ({
       {rendered}
     </div>
   );
-};
+});
 
 export default CardSwap;

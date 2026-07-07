@@ -41,10 +41,46 @@ function rotatingPill(sizeClass, reduced) {
   );
 }
 
-// ── Desktop logo centerpiece (right column) ──────────────────────────────────
-function LogoHero({ reduced }) {
+// Little stars / meteors orbiting the logo — the "astral" nod. Each orbit is a
+// rotating ring (different radius/speed/direction) carrying one glowing speck.
+function Star({ cls }) {
+  return <span className={`block rounded-full shadow-[0_0_8px_2px_rgba(91,140,255,0.55)] ${cls}`} />;
+}
+function Meteor({ from = 'from-chrome-highlight' }) {
   return (
-    <div className="relative mx-auto grid aspect-square w-full max-w-[13rem] place-items-center sm:max-w-[17rem] lg:max-w-[26rem]">
+    <span className="flex items-center">
+      <span className={`block h-[2px] w-7 rounded-full bg-gradient-to-l ${from} via-electric-400/70 to-transparent`} />
+      <span className="-ml-0.5 block h-1.5 w-1.5 rounded-full bg-chrome-highlight shadow-[0_0_8px_2px_rgba(191,214,255,0.7)]" />
+    </span>
+  );
+}
+
+const ORBITS = [
+  { inset: '-7%', anim: 'spin-slow 30s linear infinite', pos: 'left-1/2 top-0 -translate-x-1/2', el: <Star cls="h-1.5 w-1.5 bg-chrome-highlight" /> },
+  { inset: '4%', anim: 'spin-slow 42s linear infinite reverse', pos: 'right-0 top-1/2 -translate-y-1/2', el: <Meteor /> },
+  { inset: '-3%', anim: 'spin-slow 24s linear infinite', pos: 'left-1/2 bottom-0 -translate-x-1/2', el: <Star cls="h-1 w-1 bg-white" /> },
+  { inset: '11%', anim: 'spin-slow 34s linear infinite reverse', pos: 'left-0 top-1/3', el: <Star cls="h-1.5 w-1.5 bg-electric-400" /> },
+  { inset: '-9%', anim: 'spin-slow 48s linear infinite', pos: 'right-[10%] top-[6%]', el: <Meteor from="from-electric-400" /> },
+  { inset: '9%', anim: 'spin-slow 28s linear infinite', pos: 'right-[8%] bottom-[14%]', el: <Star cls="h-1 w-1 bg-electric-600" /> },
+];
+
+function OrbitStars({ reduced }) {
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {ORBITS.map((o, i) => (
+        <div key={i} className="absolute rounded-full" style={{ inset: o.inset, animation: reduced ? 'none' : o.anim }}>
+          <span className={`absolute ${o.pos}`}>{o.el}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Clean logo centerpiece — same treatment on desktop and mobile (client: keep it
+// like the desktop version, no solid circle), now with orbiting stars/meteors.
+function LogoHero({ reduced, sizeClass = 'max-w-[13rem] sm:max-w-[17rem] lg:max-w-[26rem]' }) {
+  return (
+    <div className={`relative mx-auto grid aspect-square w-full place-items-center ${sizeClass}`}>
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(30,91,255,0.35),transparent_62%)] blur-2xl animate-glow-breathe" />
 
       {!reduced && (
@@ -71,6 +107,8 @@ function LogoHero({ reduced }) {
 
       <div className="absolute inset-[2%] rounded-full border border-dashed border-white/8" />
 
+      <OrbitStars reduced={reduced} />
+
       <motion.img
         src="/logo.png"
         alt="MH Astral Systems"
@@ -82,48 +120,6 @@ function LogoHero({ reduced }) {
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
         className={`relative z-10 w-[62%] drop-shadow-[0_10px_50px_rgba(30,91,255,0.6)] ${reduced ? '' : 'animate-float-slow'}`}
       />
-
-      {!reduced && (
-        <>
-          <span className="absolute right-[16%] top-[18%] h-3 w-3 rounded-[3px] bg-electric-600 shadow-glow-soft animate-float-slow" />
-          <span className="absolute right-[10%] top-[26%] h-2 w-2 rounded-[2px] bg-electric-400 [animation:float-slow_7s_ease-in-out_infinite]" />
-          <span className="absolute left-[15%] bottom-[22%] h-1.5 w-1.5 rounded-[2px] bg-chrome-highlight/80 [animation:float-slow_8s_ease-in-out_infinite]" />
-        </>
-      )}
-    </div>
-  );
-}
-
-// ── Mobile logo badge (top, orbit ring) ──────────────────────────────────────
-function LogoBadge({ reduced }) {
-  return (
-    <div className="relative grid h-[13.5rem] w-[13.5rem] place-items-center">
-      <div className="absolute h-40 w-40 rounded-full bg-electric-600/25 blur-2xl animate-glow-breathe" aria-hidden="true" />
-
-      {/* dashed orbit ring with a travelling dot */}
-      <div className={`absolute inset-0 ${reduced ? '' : 'animate-spin-slow'}`} aria-hidden="true">
-        <div className="absolute inset-0 rounded-full border border-dashed border-white/15" />
-        <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 rounded-full bg-electric-400 shadow-glow-soft" />
-      </div>
-      <div className="absolute inset-[14%] rounded-full border border-white/6" aria-hidden="true" />
-
-      {/* filled glossy badge with the real monogram */}
-      <motion.div
-        initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.8, filter: 'blur(12px)' }}
-        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-        className="relative grid h-[8.4rem] w-[8.4rem] place-items-center rounded-full border border-electric-400/40 bg-[radial-gradient(circle_at_36%_28%,#4d80ff,#12369f_72%,#0a2160)] shadow-[0_22px_60px_-14px_rgba(30,91,255,0.85)]"
-      >
-        <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_32%_22%,rgba(255,255,255,0.4),transparent_45%)]" aria-hidden="true" />
-        <img
-          src="/logo.png"
-          alt="MH Astral Systems"
-          width={519}
-          height={463}
-          draggable={false}
-          className={`relative w-[4.4rem] drop-shadow-[0_6px_18px_rgba(0,0,0,0.45)] ${reduced ? '' : 'animate-float-slow'}`}
-        />
-      </motion.div>
     </div>
   );
 }
@@ -146,8 +142,8 @@ function MobileHero({ reduced }) {
       animate="show"
       className="container-mh relative z-10 flex flex-col items-center gap-6 text-center"
     >
-      <motion.div variants={item}>
-        <LogoBadge reduced={reduced} />
+      <motion.div variants={item} className="py-1">
+        <LogoHero reduced={reduced} sizeClass="w-[15rem] max-w-[80vw]" />
       </motion.div>
 
       <motion.span

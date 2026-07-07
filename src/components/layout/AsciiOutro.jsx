@@ -1,13 +1,17 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import FuzzyText from '../reactbits/FuzzyText';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
-// Big animated brand sign-off (react-bits ASCIIText, WebGL, recolored blue).
-// Runs on desktop AND mobile now (client wants the full animation on phones,
-// not a flat wordmark) — on mobile the plane is scaled down + the ascii grid is
-// coarser so the whole "MH Astral Systems" fits and stays light. Reduced-motion
-// still gets the clean static wordmark. WebGL mounts only when scrolled near.
+// Brand sign-off.
+//  · Desktop → react-bits ASCIIText (WebGL, recolored blue) — unchanged.
+//  · Mobile  → FuzzyText "MH Astral Systems" (the same static/glitch effect as the
+//    About title), gradient letters, split over two lines so it fits the phone.
+//  · Reduced motion → clean static wordmark.
+// The animated variants mount only when scrolled near (perf + they run rAF loops).
 const ASCIIText = lazy(() => import('../reactbits/ASCIIText'));
+
+const FUZZ_GRADIENT = ['#BFD6FF', '#5B8CFF', '#1E5BFF'];
 
 function StaticWordmark() {
   return (
@@ -19,46 +23,67 @@ function StaticWordmark() {
   );
 }
 
+function FuzzyWordmark() {
+  const common = {
+    fontWeight: 800,
+    fontFamily: "'Space Grotesk', sans-serif",
+    gradient: FUZZ_GRADIENT,
+    baseIntensity: 0.17,
+    hoverIntensity: 0.4,
+    enableHover: false, // don't hijack touch/scroll on the phone
+    fontSize: 'clamp(1.9rem, 9.2vw, 3rem)',
+  };
+  return (
+    <div className="grid h-full place-items-center px-4" aria-label="MH Astral Systems">
+      <div className="flex flex-col items-center leading-none">
+        <FuzzyText {...common}>MH Astral</FuzzyText>
+        <FuzzyText {...common}>Systems</FuzzyText>
+      </div>
+    </div>
+  );
+}
+
 export default function AsciiOutro() {
   const holderRef = useRef(null);
   const [near, setNear] = useState(false);
   const reduced = usePrefersReducedMotion();
   const isMobile = useIsMobile();
-  const useAscii = !reduced;
 
   useEffect(() => {
-    if (!useAscii) return;
+    if (reduced) return;
     const el = holderRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setNear(true)),
-      { rootMargin: '600px 0px' },
+      { rootMargin: '500px 0px' },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [useAscii]);
+  }, [reduced]);
 
   return (
     <section
       ref={holderRef}
       aria-label="MH Astral Systems"
-      className="relative mt-section h-[34vh] min-h-[210px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
+      className="relative mt-section h-[32vh] min-h-[200px] overflow-hidden border-t border-white/5 bg-void-2/30 sm:h-[46vh] sm:min-h-[300px]"
     >
-      {!useAscii ? (
+      {reduced ? (
         <StaticWordmark />
-      ) : near ? (
+      ) : !near ? (
+        <div className="skeleton absolute inset-6 rounded-2xl" aria-hidden="true" />
+      ) : isMobile ? (
+        <FuzzyWordmark />
+      ) : (
         <Suspense fallback={<div className="skeleton absolute inset-6 rounded-2xl" aria-hidden="true" />}>
           <ASCIIText
             text="MH Astral Systems"
             enableWaves
-            asciiFontSize={isMobile ? 6 : 12}
-            textFontSize={isMobile ? 100 : 170}
+            asciiFontSize={12}
+            textFontSize={170}
             textColor="#BFD6FF"
-            planeBaseHeight={isMobile ? 4.6 : 9}
+            planeBaseHeight={9}
           />
         </Suspense>
-      ) : (
-        <div className="skeleton absolute inset-6 rounded-2xl" aria-hidden="true" />
       )}
     </section>
   );

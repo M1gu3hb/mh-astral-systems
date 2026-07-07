@@ -33,7 +33,7 @@ function SvcCard({ s, i }) {
       </div>
 
       <div className="mt-3 flex items-start gap-2">
-        <h3 className="font-display text-base font-semibold leading-tight text-white sm:text-lg">{s.label}</h3>
+        <h3 className="font-display text-lg font-semibold leading-tight text-white sm:text-xl">{s.label}</h3>
         {s.highlight && (
           <span className="mt-0.5 flex-none rounded-full border border-electric-400/40 bg-electric-600/20 px-2 py-0.5 font-mono text-[0.5rem] uppercase tracking-wider text-electric-400">
             Nuevo
@@ -69,9 +69,9 @@ function useOnScreen(margin = '250px') {
 function DeckFront() {
   // static first card while the deck is parked (before it scrolls into view)
   return (
-    <div className="absolute left-1/2 top-1/2 w-[258px] max-w-[80vw] -translate-x-1/2 -translate-y-1/2 sm:w-[340px]">
+    <div className="absolute left-1/2 top-1/2 w-[300px] max-w-[86vw] -translate-x-1/2 -translate-y-1/2 sm:w-[468px]">
       <div className="overflow-hidden rounded-[20px] border border-electric-400/40 bg-gradient-to-b from-panel to-void shadow-[0_30px_80px_-30px_rgba(30,91,255,0.5)]">
-        <div className="h-[320px] sm:h-[392px]">
+        <div className="h-[356px] sm:h-[432px]">
           <SvcCard s={SERVICIOS[0]} i={0} />
         </div>
       </div>
@@ -82,13 +82,17 @@ function DeckFront() {
 function ServiciosShowcase() {
   const [deckRef, deckOn] = useOnScreen();
   const isMobile = useIsMobile();
+  const deckApi = useRef(null);
+  const [activeIdx, setActiveIdx] = useState(0);
   const deck = isMobile
-    ? { width: 258, height: 320, cardDistance: 22, verticalDistance: 28 }
-    : { width: 340, height: 392, cardDistance: 46, verticalDistance: 54 };
+    ? { width: 300, height: 356, cardDistance: 26, verticalDistance: 30 }
+    : { width: 468, height: 432, cardDistance: 52, verticalDistance: 52 };
+
+  const goTo = (i) => deckApi.current?.goTo(i);
 
   return (
     <section id="servicios" className="scroll-mt-28 overflow-hidden py-section">
-      <div className="container-mh grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:gap-12">
+      <div className="container-mh grid gap-14 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-14">
         {/* left — explain + icon legend + CTA */}
         <div>
           <SectionHeading
@@ -98,20 +102,31 @@ function ServiciosShowcase() {
             lead={SITE.support}
           />
 
-          <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Servicios disponibles">
-            {SERVICIOS.map((s) => {
+          <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Servicios — toca para verlo en el mazo">
+            {SERVICIOS.map((s, i) => {
               const Icon = s.icon;
+              const isActive = i === activeIdx;
               return (
-                <li
-                  key={s.label}
-                  title={s.label}
-                  className={`grid h-11 w-11 place-items-center rounded-xl border transition-colors duration-300 ${
-                    s.highlight
-                      ? 'border-electric-400/60 bg-electric-600/20'
-                      : 'border-white/10 bg-void-2/50 hover:border-electric-600/45'
-                  }`}
-                >
-                  <Icon size={19} strokeWidth={1.5} className="text-electric-400" aria-hidden="true" />
+                <li key={s.label}>
+                  <button
+                    type="button"
+                    title={s.label}
+                    aria-label={s.label}
+                    aria-pressed={isActive}
+                    onClick={() => goTo(i)}
+                    className={`grid h-12 w-12 place-items-center rounded-xl border transition-all duration-300 ${
+                      isActive
+                        ? 'scale-105 border-electric-400/70 bg-electric-600/25 shadow-glow-soft'
+                        : 'border-white/10 bg-void-2/50 hover:-translate-y-0.5 hover:border-electric-600/50'
+                    }`}
+                  >
+                    <Icon
+                      size={20}
+                      strokeWidth={1.5}
+                      className={isActive ? 'text-chrome-highlight' : 'text-electric-400'}
+                      aria-hidden="true"
+                    />
+                  </button>
                 </li>
               );
             })}
@@ -130,21 +145,25 @@ function ServiciosShowcase() {
           </a>
         </div>
 
-        {/* right — auto-cycling deck (mounts only while on screen) */}
-        <div ref={deckRef} className="mh-cardswap relative min-h-[380px] sm:min-h-[520px]">
+        {/* right — auto-cycling deck (mounts only while on screen); click a card
+            or a legend icon to bring that service to the front */}
+        <div ref={deckRef} className="mh-cardswap relative min-h-[400px] sm:min-h-[560px]">
           {deckOn ? (
             <CardSwap
+              ref={deckApi}
               width={deck.width}
               height={deck.height}
               cardDistance={deck.cardDistance}
               verticalDistance={deck.verticalDistance}
-              delay={3600}
+              delay={4200}
               pauseOnHover
               skewAmount={5}
               easing="elastic"
+              onIndexChange={setActiveIdx}
+              onCardClick={goTo}
             >
               {SERVICIOS.map((s, i) => (
-                <Card key={s.label} customClass="mh-svc-card">
+                <Card key={s.label} customClass="mh-svc-card cursor-pointer">
                   <SvcCard s={s} i={i} />
                 </Card>
               ))}

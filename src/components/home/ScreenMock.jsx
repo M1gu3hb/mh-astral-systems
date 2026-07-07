@@ -16,9 +16,7 @@ const Bar = ({ w = 'w-full', c = 'bg-white/12', h = 'h-2' }) => (
 
 function Chrome({ label, children }) {
   return (
-    // Fills the whole screen so the liquid-glass caption below has rich content
-    // to refract; a little extra bottom room keeps key content above the glass.
-    <div className="flex h-full w-full flex-col bg-[#070b16] p-3 pb-10 text-white sm:p-4 sm:pb-12">
+    <div className="flex h-full w-full flex-col bg-[#070b16] p-3 text-white sm:p-4">
       <div className="mb-3 flex items-center gap-2 border-b border-white/8 pb-2">
         <Dots />
         <span className="ml-1 flex-1 truncate rounded-md bg-white/5 px-2 py-0.5 font-mono text-[8px] text-silver-faint">

@@ -29,11 +29,10 @@ export const HERO = {
   ctaSecondary: 'Ver sistemas construidos',
 };
 
+// Quick navigation (client-defined IA): Home / About / Works / Blog.
 export const NAV_LINKS = [
-  { label: 'Casos', link: '/#casos', ariaLabel: 'Ver casos de éxito' },
-  { label: 'Servicios', link: '/#servicios', ariaLabel: 'Ver servicios' },
-  { label: 'Panel', link: '/#diferenciador', ariaLabel: 'Ver el panel de autoedición' },
-  { label: 'Precios', link: '/#precios', ariaLabel: 'Ver tiers de precio' },
-  { label: 'Proceso', link: '/#proceso', ariaLabel: 'Ver el proceso' },
+  { label: 'Home', link: '/', ariaLabel: 'Ir al inicio' },
+  { label: 'About', link: '/about', ariaLabel: 'Conocer planes y contacto' },
+  { label: 'Works', link: '/works', ariaLabel: 'Ver sistemas construidos y portal' },
   { label: 'Blog', link: '/blog', ariaLabel: 'Ir al blog' },
 ];

@@ -198,7 +198,7 @@ function Showcase() {
           <div className="mb-8 flex flex-col items-center gap-3 text-center sm:mb-10">
             <span className="eyebrow">
               <span className="dot-line" />
-              Cómo trabajamos <span className="text-silver-faint tracking-[0.2em]">/05</span>
+              Cómo trabajamos <span className="text-silver-faint tracking-[0.2em]">/03</span>
             </span>
             <h2 className="text-section-title font-semibold text-white">Un proceso claro, sin sorpresas</h2>
             <p className="max-w-xl text-balance text-sm text-silver-dim sm:text-base">
@@ -281,7 +281,7 @@ function StaticSteps() {
         <div className="mb-10 flex flex-col gap-3">
           <span className="eyebrow">
             <span className="dot-line" />
-            Cómo trabajamos <span className="text-silver-faint tracking-[0.2em]">/05</span>
+            Cómo trabajamos <span className="text-silver-faint tracking-[0.2em]">/03</span>
           </span>
           <h2 className="text-section-title font-semibold text-white">Un proceso claro, sin sorpresas</h2>
         </div>

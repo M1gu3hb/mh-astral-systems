@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import AsciiOutro from './AsciiOutro';
 import FloatingWhatsApp from '../ui/FloatingWhatsApp';
 
 // Shared chrome for the public marketing site (Home + Blog). Handles scrolling
@@ -24,6 +25,7 @@ export default function SiteLayout({ children }) {
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">{children}</main>
+      <AsciiOutro />
       <Footer />
       <FloatingWhatsApp />
     </div>

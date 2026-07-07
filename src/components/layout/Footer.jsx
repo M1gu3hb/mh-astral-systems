@@ -23,9 +23,9 @@ export default function Footer() {
 
         <nav className="flex flex-col gap-3 text-sm" aria-label="Enlaces del sitio">
           <span className="mb-1 font-mono text-xs uppercase tracking-[0.28em] text-silver-faint">Sitio</span>
-          <a href="/#casos" className="text-silver-dim transition-colors hover:text-white">Casos de éxito</a>
-          <a href="/#servicios" className="text-silver-dim transition-colors hover:text-white">Servicios</a>
-          <a href="/#precios" className="text-silver-dim transition-colors hover:text-white">Precios</a>
+          <Link to="/" className="text-silver-dim transition-colors hover:text-white">Home</Link>
+          <Link to="/about" className="text-silver-dim transition-colors hover:text-white">About</Link>
+          <Link to="/works" className="text-silver-dim transition-colors hover:text-white">Works</Link>
           <Link to="/blog" className="text-silver-dim transition-colors hover:text-white">Blog</Link>
           <Link to="/portal" className="text-silver-dim transition-colors hover:text-white">Portal de cliente</Link>
         </nav>

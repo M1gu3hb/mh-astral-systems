@@ -1,10 +1,47 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Check, Clock, ImageIcon, Pencil, Zap } from 'lucide-react';
-import SectionHeading from '../ui/SectionHeading';
-import Reveal from '../ui/Reveal';
+import ScrollReveal from '../reactbits/ScrollReveal';
 import GlassCard from '../ui/GlassCard';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// Scroll-scrubbed reveal for non-text blocks (the cards, the checklist, the
+// panel mock) — same feel as ScrollReveal but for arbitrary children.
+function RevealBlock({ children, className = '' }) {
+  const ref = useRef(null);
+  const reduced = usePrefersReducedMotion();
+
+  useEffect(() => {
+    if (reduced) return;
+    const el = ref.current;
+    if (!el) return;
+    const tween = gsap.fromTo(
+      el,
+      { opacity: 0.05, y: 46, filter: 'blur(9px)' },
+      {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom-=12%', end: 'top center+=10%', scrub: true },
+      },
+    );
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+    };
+  }, [reduced]);
+
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  );
+}
 
 // The differentiator gets its own section (docs/01 §5), not a list item. The
 // mockup shows the WHOLE product in one glance: the owner's panel on the left,
@@ -214,15 +251,28 @@ export default function Diferenciador() {
     <section id="diferenciador" className="scroll-mt-28 overflow-hidden py-section">
       <div className="container-mh grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="flex flex-col gap-6">
-          <SectionHeading
-            index="02"
-            eyebrow="El diferenciador"
-            title="Tu página, editable por ti"
-            lead="El problema no es técnico, es de negocio: si dependes de tu desarrollador para cada cambio menor, esperas — y mientras esperas, no vendes. El panel de autoedición quita ese cuello de botella."
-          />
+          {/* heading — everything in this section reveals with the scroll */}
+          <RevealBlock className="flex flex-col gap-4">
+            <span className="eyebrow">
+              <span className="dot-line" />
+              El diferenciador <span className="text-silver-faint tracking-[0.2em]">/02</span>
+            </span>
+            <h2 className="text-section-title font-semibold text-white">Tu página, editable por ti</h2>
+          </RevealBlock>
+
+          <ScrollReveal
+            baseOpacity={0.08}
+            enableBlur
+            baseRotation={2}
+            blurStrength={7}
+            containerClassName="!my-0"
+            textClassName="!text-base sm:!text-lg !font-normal !leading-relaxed !text-silver-dim"
+          >
+            El problema no es técnico, es de negocio: si dependes de tu desarrollador para cada cambio menor, esperas — y mientras esperas, no vendes. El panel de autoedición quita ese cuello de botella.
+          </ScrollReveal>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <Reveal>
+            <RevealBlock>
               <div className="flex h-full flex-col gap-2 rounded-2xl border border-white/8 bg-void-2/40 p-4">
                 <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-silver-faint">
                   <Clock size={15} strokeWidth={1.5} /> Sin panel
@@ -231,8 +281,8 @@ export default function Diferenciador() {
                   Le escribes a Miguel, esperas, y el cambio llega cuando puede. Las promos salen tarde.
                 </p>
               </div>
-            </Reveal>
-            <Reveal delay={0.08}>
+            </RevealBlock>
+            <RevealBlock>
               <div className="flex h-full flex-col gap-2 rounded-2xl border border-electric-600/40 bg-electric-900/20 p-4 shadow-glow-soft">
                 <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-electric-400">
                   <Zap size={15} strokeWidth={1.5} /> Con panel
@@ -241,27 +291,29 @@ export default function Diferenciador() {
                   Lo cambias tú en segundos y se ve al instante. Precios correctos, promos a tiempo.
                 </p>
               </div>
-            </Reveal>
+            </RevealBlock>
           </div>
 
-          <ul className="flex flex-col gap-2 pt-1">
-            {['Editas fotos, precios y promociones tú mismo', 'Nació de la experiencia real con Confetti', 'Se incluye en el tier Autónomo'].map(
-              (t) => (
-                <li key={t} className="flex items-center gap-3 text-sm text-silver-dim">
-                  <Check size={16} className="flex-none text-electric-400" strokeWidth={2} />
-                  {t}
-                </li>
-              ),
-            )}
-          </ul>
+          <RevealBlock>
+            <ul className="flex flex-col gap-2 pt-1">
+              {['Editas fotos, precios y promociones tú mismo', 'Nació de la experiencia real con Confetti', 'Se incluye en el tier Autónomo'].map(
+                (t) => (
+                  <li key={t} className="flex items-center gap-3 text-sm text-silver-dim">
+                    <Check size={16} className="flex-none text-electric-400" strokeWidth={2} />
+                    {t}
+                  </li>
+                ),
+              )}
+            </ul>
+          </RevealBlock>
         </div>
 
-        <Reveal delay={0.1} y={30}>
+        <RevealBlock>
           <div className="relative">
             <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-electric-600/10 blur-3xl" />
             <PanelSync />
           </div>
-        </Reveal>
+        </RevealBlock>
       </div>
     </section>
   );

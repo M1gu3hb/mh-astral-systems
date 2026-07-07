@@ -16,7 +16,7 @@ export default function Casos() {
     <section id="casos" className="scroll-mt-28 py-section">
       <div className="container-mh">
         <SectionHeading
-          index="03"
+          index="01"
           eyebrow="Sistemas construidos"
           title="Negocios reales de CDMX, ya operando"
           lead="Estos no son mockups. Son sistemas en producción, con dueños con nombre y operación diaria."

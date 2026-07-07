@@ -1,22 +1,45 @@
+import { Suspense, lazy } from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight, ArrowDown } from 'lucide-react';
-import HeroBackground from '../backgrounds/HeroBackground';
+import RotatingText from '../reactbits/RotatingText';
 import { HERO } from '../../data/site';
 import { whatsappLink, WA_MESSAGES } from '../../lib/whatsapp';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
-// The real MH logo as a glowing centerpiece: a slow conic halo, a breathing
-// radial glow and gentle float. Replaces the old orbit-of-fake-logo (client
-// feedback). Pure transform/opacity motion; the halo is decorative only.
+// Beams (react-bits) — the new hero background (replaces the old shader),
+// recolored to the brand: void backdrop + electric-blue directional light.
+// Heavy (three.js) → lazy chunk with a skeleton-shimmer fallback.
+const Beams = lazy(() => import('../reactbits/Beams'));
+
+const ROTATING_SERVICES = [
+  'páginas web',
+  'paneles propios',
+  'POS y CRM',
+  'automatizaciones',
+  'menús QR',
+  'dashboards',
+];
+
+function StaticBg() {
+  return (
+    <div
+      aria-hidden="true"
+      className="skeleton absolute inset-0"
+      style={{
+        background:
+          'radial-gradient(70% 90% at 78% 8%, rgba(30,91,255,0.28), transparent 55%),' +
+          'linear-gradient(180deg, #070B16, #0B1120)',
+      }}
+    />
+  );
+}
+
+// The real MH logo as a glowing centerpiece (kept from the previous design).
 function LogoHero({ reduced }) {
   return (
-    // Mobile: a compact emblem that lives INSIDE the hero (not a full-screen
-    // block). Desktop: the large side visual, unchanged.
     <div className="relative mx-auto grid aspect-square w-full max-w-[13rem] place-items-center sm:max-w-[17rem] lg:max-w-[26rem]">
-      {/* ambient radial bloom */}
       <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(30,91,255,0.35),transparent_62%)] blur-2xl animate-glow-breathe" />
 
-      {/* conic halo rings */}
       {!reduced && (
         <>
           <div
@@ -31,8 +54,7 @@ function LogoHero({ reduced }) {
           <div
             className="absolute inset-[20%] rounded-full opacity-50 animate-spin-slower"
             style={{
-              background:
-                'conic-gradient(from 120deg, transparent, rgba(191,214,255,0.4) 40deg, transparent 120deg)',
+              background: 'conic-gradient(from 120deg, transparent, rgba(191,214,255,0.4) 40deg, transparent 120deg)',
               mask: 'radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 0.5px))',
               WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 0.5px))',
             }}
@@ -40,10 +62,8 @@ function LogoHero({ reduced }) {
         </>
       )}
 
-      {/* dotted orbit hint */}
       <div className="absolute inset-[2%] rounded-full border border-dashed border-white/8" />
 
-      {/* the real logo */}
       <motion.img
         src="/logo.png"
         alt="MH Astral Systems"
@@ -56,7 +76,6 @@ function LogoHero({ reduced }) {
         className={`relative z-10 w-[62%] drop-shadow-[0_10px_50px_rgba(30,91,255,0.6)] ${reduced ? '' : 'animate-float-slow'}`}
       />
 
-      {/* floating pixel-square motif accents (from the logo) */}
       {!reduced && (
         <>
           <span className="absolute right-[16%] top-[18%] h-3 w-3 rounded-[3px] bg-electric-600 shadow-glow-soft animate-float-slow" />
@@ -87,11 +106,28 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-[100svh] items-center overflow-hidden pt-28 pb-16">
-      {/* animated brand background (blue) */}
+      {/* Beams background — brand-blue light over the void */}
       <div className="absolute inset-0 -z-10">
-        <HeroBackground />
-        <div className="absolute inset-0 bg-circuit opacity-[0.4]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-void/55 via-void/45 to-void" />
+        {reduced ? (
+          <StaticBg />
+        ) : (
+          <Suspense fallback={<StaticBg />}>
+            <div className="absolute inset-0">
+              <Beams
+                beamWidth={2.2}
+                beamHeight={18}
+                beamNumber={13}
+                lightColor="#2E66FF"
+                speed={1.7}
+                noiseIntensity={1.6}
+                scale={0.22}
+                rotation={28}
+              />
+            </div>
+          </Suspense>
+        )}
+        <div className="absolute inset-0 bg-circuit opacity-[0.3]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-void/45 via-void/35 to-void" />
       </div>
 
       <div className="container-mh flex flex-col items-center gap-7 lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-6">
@@ -105,13 +141,25 @@ export default function Hero() {
             {HERO.eyebrow}
           </motion.span>
 
-          {/* mixed-scale editorial headline — not a wall of huge text */}
-          <h1 className="flex flex-col gap-1">
+          {/* headline with the rotating service chip */}
+          <h1 className="flex flex-col gap-2">
             <motion.span variants={item} className="text-hero font-medium text-silver-dim">
-              {HERO.headlineLead}
+              Digitaliza tu negocio con
             </motion.span>
-            <motion.span variants={item} className="text-hero-accent font-bold text-gradient-chrome">
-              páginas y sistemas
+            <motion.span variants={item} className="flex">
+              <RotatingText
+                texts={ROTATING_SERVICES}
+                auto={!reduced}
+                mainClassName="text-hero-accent inline-flex w-fit items-center overflow-hidden rounded-2xl bg-gradient-to-b from-[#3d74ff] via-electric-600 to-[#1848d6] px-4 py-1 font-display font-bold text-white shadow-glow sm:px-6"
+                splitLevelClassName="overflow-hidden"
+                staggerFrom="last"
+                staggerDuration={0.02}
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '-120%' }}
+                transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+                rotationInterval={2600}
+              />
             </motion.span>
             <motion.span variants={item} className="text-hero font-semibold text-white">
               que sí venden y organizan.
@@ -134,7 +182,7 @@ export default function Hero() {
                 <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
               </span>
             </a>
-            <a className="btn btn-ghost pr-2" href="#casos">
+            <a className="btn btn-ghost pr-2" href="#servicios">
               <span>{HERO.ctaSecondary}</span>
               <span className="btn-orb bg-electric-600/20 text-electric-400">
                 <ArrowDown size={15} strokeWidth={1.75} aria-hidden="true" />
@@ -142,7 +190,6 @@ export default function Hero() {
             </a>
           </motion.div>
 
-          {/* one slim trust line — real facts, no clutter */}
           <motion.p variants={item} className="flex items-center gap-2.5 pt-1 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-silver-faint">
             <span className="text-electric-400">04 sistemas en producción</span>
             <span className="h-1 w-1 rounded-full bg-silver-faint/50" />

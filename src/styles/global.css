@@ -318,6 +318,27 @@
     );
   }
 
+  /* Skeleton loader shimmer — used by the splash bar and lazy-section
+     placeholders so nothing ever looks "broken" while it loads. */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: rgba(30, 91, 255, 0.1);
+  }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      rgba(91, 140, 255, 0.35) 50%,
+      transparent 80%
+    );
+    transform: translateX(-100%);
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+
   .card-grain {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   }
@@ -350,6 +371,12 @@
 @keyframes mh-marquee {
   to {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
   }
 }
 

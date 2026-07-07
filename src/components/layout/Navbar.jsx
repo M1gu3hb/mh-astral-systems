@@ -1,25 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { MessageCircle, X } from 'lucide-react';
 import GlassSurface from '../reactbits/GlassSurface';
 import StaggeredMenu from '../reactbits/StaggeredMenu';
+import GooeyNav from '../reactbits/GooeyNav';
 import Logo from '../ui/Logo';
 import { NAV_LINKS, SITE } from '../../data/site';
 import { whatsappLink, WA_MESSAGES } from '../../lib/whatsapp';
 import { useScrolled } from '../../hooks/useScrolled';
 import './navbar.css';
 
-// Navbar = floating "isla flotante" (docs/01) built on GlassSurface — the
-// location Miguel fixed for GlassSurface (docs/10). A custom hamburger lives
-// INSIDE the island (feels part of the header) on desktop AND mobile; it drives
-// the recolored StaggeredMenu (docs/09) overlay by triggering the component's
-// own toggle, so its staggered-layer animation is reused untouched.
+// Navbar = floating glass island (unchanged, per client) with the new GooeyNav
+// quick navigation (Home / About / Works / Blog) inside it on desktop. The
+// hamburger + StaggeredMenu overlay stay exactly as they were.
 //
-// /admin is intentionally absent — the internal panel is URL-only + password
-// gated (client request).
+// /admin is intentionally absent — URL-only + password gated.
 const MENU_ITEMS = [
-  { label: 'Inicio', ariaLabel: 'Ir al inicio', link: '/' },
   ...NAV_LINKS.map((l) => ({ label: l.label, ariaLabel: l.ariaLabel, link: l.link })),
   { label: 'Portal', ariaLabel: 'Portal de cliente', link: '/portal' },
 ];
@@ -32,13 +29,12 @@ const SOCIAL_ITEMS = [
 export default function Navbar() {
   const scrolled = useScrolled(24);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const openRef = useRef(false);
 
   const fireToggle = () => document.querySelector('.mh-nav-menu .sm-toggle')?.click();
 
-  // Close the overlay when a menu link is clicked (route/hash navigation keeps
-  // the layout mounted, so the panel wouldn't close on its own).
   useEffect(() => {
     const onDocClick = (e) => {
       const link = e.target.closest?.(
@@ -49,6 +45,17 @@ export default function Navbar() {
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
   }, []);
+
+  // GooeyNav items: gooey animation first, then react-router navigation.
+  const activeIdx = Math.max(
+    0,
+    NAV_LINKS.findIndex((l) => (l.link === '/' ? pathname === '/' : pathname.startsWith(l.link))),
+  );
+  const gooeyItems = NAV_LINKS.map((l) => ({
+    label: l.label,
+    href: l.link,
+    onNav: () => setTimeout(() => navigate(l.link), 180),
+  }));
 
   return (
     <>
@@ -69,13 +76,19 @@ export default function Navbar() {
             <div className="mh-nav-inner">
               <Logo />
 
-              <nav className="mh-nav-links" aria-label="Navegación principal">
-                {NAV_LINKS.map((l) => (
-                  <NavItem key={l.label} link={l.link} pathname={pathname}>
-                    {l.label}
-                  </NavItem>
-                ))}
-              </nav>
+              <div className="mh-nav-links" aria-label="Navegación principal">
+                <GooeyNav
+                  key={activeIdx}
+                  items={gooeyItems}
+                  initialActiveIndex={activeIdx}
+                  particleCount={14}
+                  particleDistances={[70, 8]}
+                  particleR={90}
+                  animationTime={550}
+                  timeVariance={260}
+                  colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+                />
+              </div>
 
               <div className="flex items-center gap-2.5">
                 <a
@@ -123,8 +136,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* visible close — sits above the overlay panel (which covers the island
-          hamburger, especially full-width on mobile) */}
+      {/* visible close — sits above the overlay panel */}
       <AnimatePresence>
         {menuOpen && (
           <motion.button
@@ -168,22 +180,5 @@ export default function Navbar() {
         }}
       />
     </>
-  );
-}
-
-function NavItem({ link, children, pathname }) {
-  const isHash = link.startsWith('/#');
-  if (isHash) {
-    return (
-      <a href={link} className="mh-nav-link">
-        {children}
-      </a>
-    );
-  }
-  const active = pathname === link;
-  return (
-    <Link to={link} className={`mh-nav-link ${active ? 'is-active' : ''}`}>
-      {children}
-    </Link>
   );
 }

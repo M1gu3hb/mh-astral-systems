@@ -60,7 +60,7 @@ export default function ContactCard() {
       <div className="container-mh">
         <SectionHeading
           align="center"
-          index="06"
+          index="02"
           eyebrow="Tarjeta digital"
           title="Un negocio real, con dueño con nombre"
           lead="No una agencia anónima. Escanea, guarda el contacto y platiquemos por WhatsApp."
